@@ -69,11 +69,19 @@ class Mongologue
      * @param User $user Details of User to be Registered
      *
      * @access public
-     * @return void
+     * @return bool true if success
      */
     public function registerUser(User $user)
     {
-        $this->_userCollection->insert($user->document());
+        try {
+            User::fromID($user->id(), $this->_userCollection);
+        } catch (\Exception $e) {
+            $this->_userCollection->insert($user->document());
+            return true;
+        }
+
+        return false;
+        
     }
 
     /**
@@ -81,11 +89,17 @@ class Mongologue
      * 
      * @param Group $group Group to be Registered
      * 
-     * @return void
+     * @return bool true if success
      */
     public function registerGroup(Group $group)
     {
-        $this->_groupCollection->insert($group->document());
+        try {
+            Group::fromID($group->id(), $this->_groupCollection);
+        } catch (\Exception $e) {
+            $this->_groupCollection->insert($group->document());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -177,7 +191,7 @@ class Mongologue
      */
     public function getUser($userId)
     {
-        return User::fromId($userId, $this->_userCollection);
+        return User::fromID($userId, $this->_userCollection);
     }
 
     /**
@@ -190,6 +204,36 @@ class Mongologue
     public function getFollowers($userId)
     {
         return User::fromID($userId, $this->_userCollection)->followers();
+    }
+
+    /**
+     * Get All the Groups
+     * 
+     * @return array List of all groups
+     */
+    public function getAllGroups()
+    {
+        $groups = array();
+
+        $cursor = $this->_groupCollection->find();
+
+        foreach ($cursor as $document) {
+            $groups[] = Group::fromDocument($document);
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Get a Group from ID
+     * 
+     * @param string $id Id of the Group
+     * 
+     * @return Group A Group that matches the Id
+     */
+    public function getGroup($id)
+    {
+        return Group::fromID($id, $this->_groupCollection);
     }
 }
 ?>

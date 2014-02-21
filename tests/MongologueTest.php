@@ -138,5 +138,31 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * Should Be Able To Register Group
+     *
+     * @test
+     * 
+     * @return [type] [description]
+     */
+    public function shouldBeAbleToRegisterGroup()
+    {
+        $dbName = self::DB_NAME;
+
+        $group = array(
+            "id" => 1,
+            "name" => "Foo"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerGroup(
+            new \Mongologue\Group($group)
+        );
+
+        foreach ($app->getAllGroups() as $group) {
+            $this->assertEquals("Foo", $group->name());
+        }
+    }
+
 }
 ?>
