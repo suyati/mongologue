@@ -142,7 +142,7 @@ class Mongologue
     public function followGroup($groupId, $followerId)
     {
         $user = User::fromId($followerId, $this->_userCollection);
-        $user->followGroup($groupId, $this->_userCollection);
+        return $user->followGroup($groupId, $this->_userCollection, $this->_groupCollection);
     }
 
     /**
@@ -198,6 +198,30 @@ class Mongologue
     public function getFollowers($userId)
     {
         return User::fromID($userId, $this->_userCollection)->followers();
+    }
+
+    /**
+     * Get the Users that a User follow
+     * 
+     * @param string $userId Id of the user
+     * 
+     * @return array list of users that the user follows
+     */
+    public function getFollowingUsers($userId)
+    {
+        return User::fromID($userId, $this->_userCollection)->followingUsers();
+    }
+
+    /**
+     * Get the Groups that a User follow
+     * 
+     * @param string $userId Id of the user
+     * 
+     * @return array list of groups that the user follows
+     */
+    public function getFollowingGroups($userId)
+    {
+        return User::fromID($userId, $this->_userCollection)->followingGroups();
     }
 
     /**

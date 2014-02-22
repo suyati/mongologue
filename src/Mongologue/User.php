@@ -128,7 +128,7 @@ class User
     public function followUser($userId, \MongoCollection $collection)
     {
         try {
-            $user = self::fromID($userId);
+            $user = self::fromID($userId, $collection);
             $user->addFollower($this->_id, $collection);
         } catch (\Exception $e) {
             return false;
@@ -141,21 +141,22 @@ class User
     /**
      * Follow a Group
      * 
-     * @param string          $groupId    Id of Group to Follow
-     * @param MongoCollection $collection Collection of Users
+     * @param string          $groupId         Id of Group to Follow
+     * @param MongoCollection $userCollection  Collection of Users
+     * @param MongoCollection $groupCollection Collection of Groups
      * 
      * @return boolean True if Success
      */
-    public function followGroup($groupId, \MongoCollection $collection)
+    public function followGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
     {
         try {
-            $group = Group::fromID($groupId);
+            $group = Group::fromID($groupId, $groupCollection);
         } catch (\Exception $e) {
             return false;
         }
         
         $this->_followingGroups[] = $groupId;
-        $this->update($collection);
+        $this->update($userCollection);
         return true;
     }
 
@@ -170,7 +171,7 @@ class User
     public function addFollower($userId, \MongoCollection $collection)
     {
         try {
-            $user = self::fromID($userId);
+            $user = self::fromID($userId, $collection);
         } catch (\Exception $e) {
             return false;
         }
@@ -223,6 +224,26 @@ class User
     public function followers()
     {
         return $this->_followers;
+    }
+
+    /**
+     * get the Users the USer is following
+     * 
+     * @return array list of users that the user is following
+     */
+    public function followingUsers()
+    {
+        return $this->_followingUsers;
+    }
+
+    /**
+     * Get the Groups the User is following
+     * 
+     * @return array list of groups that the user is following
+     */
+    public function followingGroups()
+    {
+        return $this->_followingGroups;
     }
 }
 ?>

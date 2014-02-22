@@ -110,15 +110,15 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
         $user1 = array(
             "id"=>"1238899884849",
-            "handle"=>"nbos",
-            "firstName"=>"Naveen",
+            "handle"=>"jack",
+            "firstName"=>"Don",
             "lastName"=>"Bos"
         );
         $user2 = array(
             "id"=>"1238899884847",
-            "handle"=>"unni",
-            "firstName"=>"Unni",
-            "lastName"=>"PN"
+            "handle"=>"roro",
+            "firstName"=>"Zoro",
+            "lastName"=>"Roro"
         );
 
         $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
@@ -129,13 +129,21 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             new \Mongologue\User($user2)
         );
 
-        $app->followUser($user2["id"], $user1["id"]);
+        $this->assertTrue($app->followUser($user2["id"], $user1["id"]));
 
-        $followers = $app->getFollowers($user1["id"]);
+        $followers = $app->getFollowers($user2["id"]);
 
-        foreach ($followers as $id) {
-            $this->assertEquals($user2["id"], $id);
-        }
+        $following = $app->getFollowingUsers($user1["id"]);
+
+        $this->assertTrue(
+            in_array($user1["id"], $followers),
+            'Follow not Registered at Followee'
+        );
+
+        $this->assertTrue(
+            in_array($user2["id"], $following),
+            'Follow not Registered at Follower'
+        );
     }
 
     /**
@@ -162,6 +170,50 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         foreach ($app->getAllGroups() as $group) {
             $this->assertEquals("Foo", $group->name());
         }
+    }
+    /**
+     * Shoud be able follow groups
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldBeAbleToFollowGroups()
+    {
+        $dbName = self::DB_NAME;
+
+        $user = array(
+            "id"=>"1238899884878",
+            "handle"=>"sam",
+            "firstName"=>"Samuel",
+            "lastName"=>"Jackson"
+        );
+
+        $group = array(
+            "id" => 2,
+            "name" => "Pulp Fiction"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerUser(
+            new \Mongologue\User($user)
+        );
+        $app->registerGroup(
+            new \Mongologue\Group($group)
+        );
+
+        $this->assertTrue(
+            $app->followGroup($group["id"], $user["id"]),
+            "Group or User does not exist"
+        );
+
+        $followingGroups = $app->getFollowingGroups($user["id"]);
+
+        $this->assertTrue(
+            in_array($group["id"], $followingGroups),
+            "Follow not registered at user"
+        );
+
     }
 
 }
