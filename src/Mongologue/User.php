@@ -27,6 +27,7 @@ class User
     private $_handle;
     private $_firstName;
     private $_lastName;
+    private $_emailId;
     private $_followers = array();
     private $_followingUsers = array();
     private $_groups = array();
@@ -74,6 +75,9 @@ class User
         $this->_firstName = $user["firstName"];
         $this->_lastName = $user["lastName"];
 
+        if (isset($user["emailId"])) {
+            $this->_emailId = $user["emailId"];
+        }
         if (isset($user["groups"])) {
             $this->_groups = $user["groups"];
         }
@@ -96,10 +100,11 @@ class User
     public function document()
     {
         $document = array(
-            "id" => $this->_id,
-            "handle" => $this->_handle,
+            "id"        => $this->_id,
+            "handle"    => $this->_handle,
             "firstName" => $this->_firstName,
-            "lastName" => $this->_lastName,
+            "lastName"  => $this->_lastName,
+            "emailId"   =>  $this->_emailId,
             "groups" => $this->_groups,
             "followers" => $this->_followers,
             "followingGroups" => $this->_followingGroups,
