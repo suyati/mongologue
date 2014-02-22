@@ -127,7 +127,7 @@ class Mongologue
     public function followUser($followeeId, $followerId)
     {
         $user = User::fromId($followerId, $this->_userCollection);
-        $user->followUser($followeeId, $this->_userCollection);
+        return $user->followUser($followeeId, $this->_userCollection);
     }
 
     /**
