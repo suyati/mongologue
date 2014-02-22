@@ -126,15 +126,8 @@ class Mongologue
      */
     public function followUser($followeeId, $followerId)
     {
-
-        $user = User::fromId($followeeId, $this->_userCollection);
-
-        $user->follow($followerId);
-
-        $this->_userCollection->update(
-            array("id"=>$user->id()),
-            $user->document()
-        );
+        $user = User::fromId($followerId, $this->_userCollection);
+        $user->followUser($followeeId, $this->_userCollection);
     }
 
     /**
@@ -148,7 +141,8 @@ class Mongologue
      */
     public function followGroup($groupId, $followerId)
     {
-        return Group::follow($groupId, $followerId);
+        $user = User::fromId($followerId, $this->_userCollection);
+        $user->followGroup($groupId, $this->_userCollection);
     }
 
     /**

@@ -11,6 +11,8 @@
  */
 namespace Mongologue;
 
+use \Mongologue\Group;
+
 /**
  * Class Managing Users
  *
@@ -117,15 +119,80 @@ class User
 
     /**
      * Follow this USer
-     * 
-     * @param string $userId Id of the Following User
+     *   
+     * @param string          $userId     Id of the Following User
+     * @param MongoCollection $collection Collection of Users 
      * 
      * @return bool True if success
      */
-    public function follow($userId)
+    public function followUser($userId, \MongoCollection $collection)
     {
-        $this->_followers[] = $userId;
+        try {
+            $user = self::fromID($userId);
+            $user->addFollower($this->_id, $collection);
+        } catch (\Exception $e) {
+            return false;
+        }
+        $this->_followingUsers[] = $userId;
+        $this->update($collection);
         return true;
+    }
+
+    /**
+     * Follow a Group
+     * 
+     * @param string          $groupId    Id of Group to Follow
+     * @param MongoCollection $collection Collection of Users
+     * 
+     * @return boolean True if Success
+     */
+    public function followGroup($groupId, \MongoCollection $collection)
+    {
+        try {
+            $group = Group::fromID($groupId);
+        } catch (\Exception $e) {
+            return false;
+        }
+        
+        $this->_followingGroups[] = $groupId;
+        $this->update($collection);
+        return true;
+    }
+
+    /**
+     * Add a Follower
+     * 
+     * @param string          $userId     Add a Follower
+     * @param MongoCollection $collection Collection of Users
+     *
+     * @return  boolean True if Success
+     */
+    public function addFollower($userId, \MongoCollection $collection)
+    {
+        try {
+            $user = self::fromID($userId);
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $this->_followers[] = $userId;
+        $this->update($collection);
+        return true;
+    }
+
+    /**
+     * Update the Document for the User
+     * 
+     * @param MongoCollection $collection Collection of Users
+     * 
+     * @return void
+     */
+    public function update(\MongoCollection $collection)
+    {
+        $collection->update(
+            array("id"=>$this->_id),
+            $this->document()
+        );
     }
 
     /**
