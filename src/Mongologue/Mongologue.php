@@ -74,13 +74,12 @@ class Mongologue
     public function registerUser(User $user)
     {
         try {
-            User::fromID($user->id(), $this->_userCollection);
-        } catch (\Exception $e) {
-            $this->_userCollection->insert($user->document());
+            User::registerUser($user, $this->_userCollection);
             return true;
+            
+        } catch (Exception $e) {
+            return false;
         }
-
-        return false;
         
     }
 

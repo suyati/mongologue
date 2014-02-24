@@ -83,6 +83,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         $user = array(
             "id"=>"1238899884848",
             "handle"=>"jdoe",
+            "emailId"=>"jdoe@x.com",
             "firstName"=>"John",
             "lastName"=>"Doe"
         );
@@ -94,6 +95,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
         foreach ($app->getAllUsers() as $user) {
             $this->assertEquals("John Doe", $user->name());
+            $this->assertEquals("jdoe@x.com", $user->email());
         }
 
     }
@@ -185,6 +187,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         $user = array(
             "id"=>"1238899884878",
             "handle"=>"sam",
+            "emailId" => "sam@pulp.fiction",
             "firstName"=>"Samuel",
             "lastName"=>"Jackson"
         );

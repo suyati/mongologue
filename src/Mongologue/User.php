@@ -12,6 +12,7 @@
 namespace Mongologue;
 
 use \Mongologue\Group;
+use \Mongologue\Exceptions;
 
 /**
  * Class Managing Users
@@ -52,7 +53,10 @@ class User
      * 
      * @param string          $userId     Id of the USer
      * @param MongoCollection $collection user collection
-     * 
+     *
+     * @throws UserNotFoundException if the user with the provided id does not exist
+     *                               in the colleciton.
+     *                               
      * @return User Instance of a User
      */
     public static function fromID($userId,\MongoCollection $collection)
@@ -61,8 +65,31 @@ class User
         if($user)
             return new self($user);
         else
-            throw new \Exception("No Such User");
+            throw new Exceptions\User\UserNotFoundException("No Such User");
             
+    }
+
+    /**
+     * Register a User to the System.
+     * 
+     * @param User            $user       User Object to be registered
+     * @param MongoCollection $collection Collection of Users
+     *
+     * @throws DuplicateUserException If the user id is already registered
+     * 
+     * @return boolean True if Insertion happens
+     */
+    public static function registerUser(self $user, \MongoCollection $collection)
+    {
+        $tempUser = $collection->findOne(array("id"=> $user->id()));
+
+        if ($tempUser) {
+            throw new Exceptions\User\DuplicateUserException("User Id already Registered", 1);
+        } else {
+            $collection->insert($user->document());
+        }
+
+        return true;
     }
     
     /**
@@ -204,6 +231,16 @@ class User
     public function name()
     {
         return implode(' ', array($this->_firstName, $this->_lastName));
+    }
+
+    /**
+     * Get the Email of the User
+     * 
+     * @return string email id of the user
+     */
+    public function email()
+    {
+        return $this->_emailId;
     }
 
     /**
