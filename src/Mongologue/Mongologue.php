@@ -73,13 +73,8 @@ class Mongologue
      */
     public function registerUser(User $user)
     {
-        try {
-            User::registerUser($user, $this->_userCollection);
-            return true;
-            
-        } catch (Exception $e) {
-            return false;
-        }
+         User::registerUser($user, $this->_userCollection);
+         return true;        
         
     }
 
@@ -91,14 +86,9 @@ class Mongologue
      * @return bool true if success
      */
     public function registerGroup(Group $group)
-    {
-        try {
-            Group::fromID($group->id(), $this->_groupCollection);
-        } catch (\Exception $e) {
-            $this->_groupCollection->insert($group->document());
-            return true;
-        }
-        return false;
+    {       
+            Group::registerGroup($group, $this->_groupCollection);
+            return true;        
     }
 
     /**

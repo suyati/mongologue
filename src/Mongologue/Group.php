@@ -40,7 +40,30 @@ class Group
         if($group)
             return new self($group);
         else
-            throw new \Exception("No Such Group");
+            throw new Exceptions\Group\GroupNotFoundException("No Such Group");
+    }
+
+     /**
+     * Register a User to the System.
+     * 
+     * @param Group            $group       Group Object to be added
+     * @param MongoCollection $collection Collection of Groups
+     *
+     * @throws DuplicateGroupException If the group id is already added
+     * 
+     * @return boolean True if Insertion happens
+     */
+    public static function registerGroup(self $group, \MongoCollection $collection)
+    {
+        $tempGroup = $collection->findOne(array("id"=> $group->id()));
+
+        if ($tempGroup) {
+            throw new Exceptions\Group\DuplicateGroupException("Group Id already Added", 1);
+        } else {
+            $collection->insert($group->document());
+        }
+
+        return true;
     }
 
     /**
