@@ -58,8 +58,9 @@ class Group
         $tempGroup = $collection->findOne(array("id"=> $group->id()));
 
         if ($tempGroup) {
-            throw new Exceptions\Group\DuplicateGroupException("Group Id already Added", 1);
+            throw new Exceptions\Group\DuplicateGroupException("Group Id already Added");
         } else {
+            if($tempGroup=="")
             $collection->insert($group->document());
         }
 
