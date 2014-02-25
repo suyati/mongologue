@@ -21,7 +21,7 @@ namespace Mongologue\Exceptions\Group;
  * @license  NONE http://suyati.com
  * @link     http://suyati.com
  */
-class GroupNotFoundException extends \Exception
+class GroupAlreadyFollowingException extends \Exception
 {
 	/**
      * Constructor for custom Exception
@@ -30,7 +30,7 @@ class GroupNotFoundException extends \Exception
      * @param integer   $code     Exception Code
      * @param Exception $previous Prevoious exception if any
      */
-    public function __construct($message, $code=308, \Exception $previous = null)
+    public function __construct($message, $code=309, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

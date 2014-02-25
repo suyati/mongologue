@@ -120,6 +120,21 @@ class Mongologue
     }
 
     /**
+     * unFollow a User
+     * 
+     * @param string $followeeId Id of the User that is to be Followed
+     * @param string $followerId Id of the User who is following
+     *
+     * @access public
+     * @return bool True if Success
+     */
+    public function unFollowUser($followeeId, $followerId)
+    {
+        $user = User::fromId($followerId, $this->_userCollection);
+        return $user->unFollowUser($followeeId, $this->_userCollection);
+    }
+
+    /**
      * Follow a Group
      * 
      * @param string $groupId    Id of the Group to be followed
@@ -132,6 +147,21 @@ class Mongologue
     {
         $user = User::fromId($followerId, $this->_userCollection);
         return $user->followGroup($groupId, $this->_userCollection, $this->_groupCollection);
+    }
+
+    /**
+     * unFollow a Group
+     * 
+     * @param string $groupId    Id of the Group to be followed
+     * @param string $followerId Id of the User who is following
+     *
+     * @access public
+     * @return bool True if Success
+     */
+    public function unFollowGroup($groupId, $followerId)
+    {
+        $user = User::fromId($followerId, $this->_userCollection);
+        return $user->unFollowGroup($groupId, $this->_userCollection, $this->_groupCollection);
     }
 
     /**

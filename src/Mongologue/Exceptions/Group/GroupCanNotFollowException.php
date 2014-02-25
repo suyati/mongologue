@@ -21,7 +21,7 @@ namespace Mongologue\Exceptions\Group;
  * @license  NONE http://suyati.com
  * @link     http://suyati.com
  */
-class GroupNotFoundException extends \Exception
+class GroupCanNotFollowException extends \Exception
 {
 	/**
      * Constructor for custom Exception

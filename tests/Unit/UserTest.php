@@ -132,5 +132,20 @@ class UnitTest extends \PHPUnit_Framework_TestCase
         );
         
     }
+
+
+    public function shoulThrowCustomeExceptionIfAUserNotFollowing()
+    {
+        $dbName = self::DB_NAME;
+
+        $request = array(
+            "id"=>"1",
+            "id"=>"2"
+            );
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->followUser(
+            new \Mongologue\User($request)
+            );
+    }
 }
 ?>

@@ -33,6 +33,8 @@ class User
     private $_emailId;
     private $_profilePicUrl;
     private $_age;
+    private $_friends = array();
+    private $_likePages = array();
     private $_followers = array();
     private $_followingUsers = array();
     private $_groups = array();
@@ -115,6 +117,12 @@ class User
         if (isset($user["age"])) {
             $this->_age = $user["age"];
         }
+        if (isset($user["friends"])) {
+            $this->_friends = $user["friends"];
+        }
+        if (isset($user["likePages"])) {
+            $this->_likePages = $user["likePages"];
+        }
         if (isset($user["groups"])) {
             $this->_groups = $user["groups"];
         }
@@ -144,6 +152,8 @@ class User
             "emailId"   =>  $this->_emailId,
             "profilePicUrl"   =>  $this->_profilePicUrl,
             "age"   =>  $this->_age,
+            "friends"   =>  $this->_friends,
+            "likePages"   =>  $this->_likePages,
             "groups" => $this->_groups,
             "followers" => $this->_followers,
             "followingGroups" => $this->_followingGroups,
@@ -164,15 +174,55 @@ class User
      */
     public function followUser($userId, \MongoCollection $collection)
     {
-        try {
+        if (in_array($userId, $this->_followingUsers)) {
+            throw new Exceptions\User\AlreadyFollowingException("User with ID $userId is already being followed");
+        } else {
             $user = self::fromID($userId, $collection);
             $user->addFollower($this->_id, $collection);
-        } catch (\Exception $e) {
-            return false;
+            $this->_followingUsers[] = $userId;
+            $this->update($collection);
+            return true;
         }
-        $this->_followingUsers[] = $userId;
-        $this->update($collection);
-        return true;
+    }
+
+    /**
+     * UnFollow this USer
+     *   
+     * @param string          $userId     Id of the Following User
+     * @param MongoCollection $collection Collection of Users 
+     * 
+     * @return bool True if success
+     */
+    public function unFollowUser($userId, \MongoCollection $collection)
+    {
+        if (in_array($userId, $this->_followingUsers)) {
+            $this->_followingUsers = array_diff($this->_followingUsers, array($userId));
+            $user = self::fromID($userId, $collection);
+            $user->removeFollower($this->_id, $collection);
+            $this->update($collection);
+            return true;
+        } else {
+            throw new Exceptions\User\NotFollowingException("User is not following User With ID $userId");
+        }
+    }
+
+    /**
+     * remove a Follower
+     * 
+     * @param string          $userId     Add a Follower
+     * @param MongoCollection $collection Collection of Users
+     *
+     * @return  boolean True if Success
+     */
+    public function removeFollower($userId, \MongoCollection $collection)
+    {
+        if (in_array($userId, $this->_followers)) {
+            $this->_followers = array_diff($this->_followers, array($userId));
+            $this->update($collection);
+            return true;
+        } else {
+            throw new Exceptions\User\FollowerNotFoundException("Follower with ID $userId cannot be found in followers list");
+        }
     }
 
     /**
@@ -186,15 +236,36 @@ class User
      */
     public function followGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
     {
-        try {
-            $group = Group::fromID($groupId, $groupCollection);
-        } catch (\Exception $e) {
-            return false;
+        if(in_array($groupId, $this->_followingGroups)){
+            throw new Exceptions\Group\GroupAlreadyFollowingException("Group with ID $groupId is already being followed");
+        } else {
+            $group = Group::fromID($groupId, $groupCollection);        
+            
+            $this->_followingGroups[] = $groupId;
+            $this->update($userCollection);
+            return true;
         }
-        
-        $this->_followingGroups[] = $groupId;
-        $this->update($userCollection);
-        return true;
+    }
+
+     /**
+     * UnFollow a Group
+     * 
+     * @param string          $groupId         Id of Group to Follow
+     * @param MongoCollection $userCollection  Collection of Users
+     * @param MongoCollection $groupCollection Collection of Groups
+     * 
+     * @return boolean True if Success
+     */
+    public function unFollowGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
+    {
+        if(in_array($groupId, $this->_followingGroups)){
+            $this->_followingGroups = array_diff($this->_followingGroups, array($groupId));
+            $group = Group::fromID($groupId, $groupCollection);            
+            $this->update($userCollection);
+            return true;
+        } else {
+            throw new Exceptions\Group\UserNotFollowingThisGroupException("User not following this groups");
+        }
     }
 
     /**
@@ -207,12 +278,9 @@ class User
      */
     public function addFollower($userId, \MongoCollection $collection)
     {
-        try {
-            $user = self::fromID($userId, $collection);
-        } catch (\Exception $e) {
-            return false;
-        }
 
+        $user = self::fromID($userId, $collection);
+       
         $this->_followers[] = $userId;
         $this->update($collection);
         return true;

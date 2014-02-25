@@ -1,27 +1,26 @@
 <?php
 /**
- * File Containing Exception for Group not Found
+ * File Containing Exception for User not Found
  *
  * @category Mongologue
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @author   @naveenbos <nmohanan@suyati.com>
+ * @author   @nmohanan <nmohanan@suyati.com>
  * @license  NONE http://suyati.com
  * @link     http://suyati.com
  */
-namespace Mongologue\Exceptions\Group;
+namespace Mongologue\Exceptions\User;
 
 /**
- * Exception for Group not Found
+ * Exception for User not Found
  *
  * @category Mongologue
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @author   @naveenbos <nmohanan@suyati.com>
  * @license  NONE http://suyati.com
  * @link     http://suyati.com
  */
-class GroupNotFoundException extends \Exception
+class NotFollowingException extends \Exception
 {
 	/**
      * Constructor for custom Exception
@@ -30,7 +29,7 @@ class GroupNotFoundException extends \Exception
      * @param integer   $code     Exception Code
      * @param Exception $previous Prevoious exception if any
      */
-    public function __construct($message, $code=308, \Exception $previous = null)
+    public function __construct($message, $code=305, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
