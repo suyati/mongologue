@@ -5,6 +5,7 @@
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
+ * @author   @naveenbos <nmohanan@suyati.com>
  * @license  NONE http://suyati.com
  * @version  0.1.1
  * @link     http://suyati.com
@@ -25,6 +26,8 @@ class Group
 {
     private $_id;
     private $_name;
+    private $_type;
+    private $_parent=array();
 
     /**
      * Create a Group from Id
@@ -88,6 +91,13 @@ class Group
     {
         $this->_id = $group["id"];
         $this->_name = $group["name"];
+
+        if (isset($group["type"])) {
+            $this->_type = $group["type"];
+        }
+        if (isset($group["parent"])) {
+            $this->_parent = $group["parent"];
+        }
     }
 
     /**
@@ -119,7 +129,9 @@ class Group
     {
         $document = array(
             "id" => $this->_id,
-            "name" => $this->_name
+            "name" => $this->_name,
+            "type" => $this->_type,
+            "parent" => $this->_parent
         );
 
         return $document;

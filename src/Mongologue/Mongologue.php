@@ -15,6 +15,7 @@ use \Mongologue\Config;
 use \Mongologue\User;
 use \Mongologue\Post;
 use \Mongologue\Group;
+use \Mongologue\Category;
 
 /**
  * Core Mongologue Class
@@ -34,6 +35,7 @@ class Mongologue
     private $_groupCollection;
     private $_commentsCollection;
     private $_postCollection;
+    private $_categoryCollection;
     private $_grid;
     
     /**
@@ -51,6 +53,7 @@ class Mongologue
         $commentCollection = Config::COMMENTS_COLLECTION;
         $postCollection = Config::POST_COLLECTION;
         $groupCollection = Config::GROUP_COLLECTION;
+        $categoryCollection = Config::CATEGORY_COLLECTION;
 
         $this->_client = $client;
         $this->_db = $this->_client->$dbName;
@@ -59,6 +62,7 @@ class Mongologue
         $this->_groupCollection = $this->_db->createCollection($groupCollection);
         $this->_commentsCollection = $this->_db->createCollection($commentCollection);
         $this->_postCollection = $this->_db->createCollection($postCollection);
+        $this->_categoryCollection = $this->_db->createCollection($categoryCollection);
         $this->_grid = $this->_db->getGridFS();
 
     }
@@ -88,6 +92,19 @@ class Mongologue
     public function registerGroup(Group $group)
     {       
             Group::registerGroup($group, $this->_groupCollection);
+            return true;        
+    }
+
+    /**
+     * Register A Category 
+     * 
+     * @param Category $category Category to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function registerCategory(Category $category)
+    {       
+            Category::registerCategory($category, $this->_categoryCollection);
             return true;        
     }
 
@@ -271,6 +288,36 @@ class Mongologue
     public function getGroup($id)
     {
         return Group::fromID($id, $this->_groupCollection);
+    }
+
+    /**
+     * Get All the Categories
+     * 
+     * @return array List of all Categories
+     */
+    public function getAllCategories()
+    {
+        $categories = array();
+
+        $cursor = $this->_categoryCollection->find();
+
+        foreach ($cursor as $document) {
+            $categories[] = Category::fromDocument($document);
+        }
+
+        return $categories;
+    }
+
+   /**
+     * Get a Category from ID
+     * 
+     * @param string $id Id of the Category
+     * 
+     * @return Category A Category that matches the Id
+     */
+    public function getCategory($id)
+    {
+        return Category::fromID($id, $this->_categoryCollection);
     }
 }
 ?>

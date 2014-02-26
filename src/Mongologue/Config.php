@@ -28,5 +28,6 @@ class Config
     const POST_COLLECTION = "posts";
     const GROUP_COLLECTION = "groups";
     const COMMENTS_COLLECTION = "comments";
+    const CATEGORY_COLLECTION = "category";
 }
 ?>

@@ -138,14 +138,32 @@ class UnitTest extends \PHPUnit_Framework_TestCase
     {
         $dbName = self::DB_NAME;
 
-        $request = array(
-            "id"=>"1",
-            "id"=>"2"
+        $user1 = array(
+             "id"=>"1",
+            "handle"=>"jack",
+            "firstName"=>"Don",
+            "lastName"=>"Bos"
+            );
+        $user2 = array(
+             "id"=>"2",
+            "handle"=>"naveen",
+            "firstName"=>"Disusa",
+            "lastName"=>"Boss"
             );
         $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
-        $app->followUser(
-            new \Mongologue\User($request)
-            );
+        $this->assertTrue($app->followUser($user2["id"], $user1["id"]));
+        $followers = $app->getFollowers($user2["id"]);
+
+        $following = $app->getFollowingUsers($user1["id"]);
+        $this->assertTrue(
+            in_array($user1["id"], $followers),
+            'Follow not Registered at Followee'
+        );
+
+        $this->assertTrue(
+            in_array($user2["id"], $following),
+            'Follow not Registered at Follower'
+        );
     }
 }
 ?>
