@@ -58,6 +58,9 @@ class Mongologue
         $this->_client = $client;
         $this->_db = $this->_client->$dbName;
         
+        //Setting up Counters for Incremental Ids
+        $this->_countersCollection = $this->_db->createCollection("counters");
+
         $this->_userCollection = $this->_db->createCollection($userCollection);
         $this->_groupCollection = $this->_db->createCollection($groupCollection);
         $this->_commentsCollection = $this->_db->createCollection($commentCollection);
@@ -110,14 +113,15 @@ class Mongologue
 
     /**
      * Create Post
-     * 
-     * @param Post $post Post to be Created
+     *
+     * @param array $post Details Post to be Created
      *
      * @access public
      * @return bool True if success
      */
-    public function createPost(Post $post)
+    public function createPost(array $post)
     {
+        $post = new Post($post, $this->_countersCollection);
         return Post::savePost($post, $this->_grid, $this->_postCollection);
     }
 
@@ -308,7 +312,7 @@ class Mongologue
         return $categories;
     }
 
-   /**
+    /**
      * Get a Category from ID
      * 
      * @param string $id Id of the Category

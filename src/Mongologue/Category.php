@@ -25,13 +25,13 @@ namespace Mongologue;
 
 class Category
 {
-	private $_id;
-	private $_name;
+    private $_id;
+    private $_name;
 
-	/**
+    /**
      * Create a Category from Id
      * 
-     * @param string          $catgoryId    Id of Category
+     * @param string          $categoryId Id of Category
      * @param MongoCollection $collection Collection of Category
      * 
      * @return void
@@ -48,7 +48,7 @@ class Category
     /**
      * Register a User to the System.
      * 
-     * @param Category            $category       Category Object to be added
+     * @param Category        $category   Category Object to be added
      * @param MongoCollection $collection Collection of Categories
      *
      * @throws DuplicateCategoryException If the category id is already added
@@ -72,7 +72,7 @@ class Category
      /**
      * Create Category Object from Document
      * 
-     * @param array $category Document of Category
+     * @param array $document Document of Category
      * 
      * @return void
      */
