@@ -219,5 +219,54 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Post should be Created
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldBeAbleToMakePostsAndComments()
+    {
+        $dbName = self::DB_NAME;
+
+        $user = array(
+            "id"=>"1238899884579",
+            "handle"=>"rudolph",
+            "emailId" => "rudy@pulp.fiction",
+            "firstName"=>"Rudolph",
+            "lastName"=>"RedNose"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerUser(
+            new \Mongologue\User($user)
+        );
+
+        $post = array(
+            "userId"=>"1238899884579",
+            "datetime"=>"12.01.2014",
+            "content"=>"hello testing",
+            "filesToBeAdded" => array(
+                "tests/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $postId = $app->createPost($post);
+
+        $res = $app->getPost($postId);
+        
+        foreach ($res->getFiles() as $key => $id) {
+            $file = $app->getFile($id);
+            $this->assertEquals("tests/resources/sherlock.jpg", $file->getFileName());
+        }
+
+        $this->assertEquals($post["content"], $res->getContent());
+
+    }
+
 }
 ?>

@@ -121,7 +121,10 @@ class Mongologue
      */
     public function createPost(array $post)
     {
-        $post = new Post($post, $this->_countersCollection);
+        $user = User::fromID($post["userId"], $this->_userCollection);
+        $id = Post::getNextPostId($this->_countersCollection);
+        $post["id"] = $id;
+        $post = new Post($post);
         return Post::savePost($post, $this->_grid, $this->_postCollection);
     }
 
@@ -292,6 +295,30 @@ class Mongologue
     public function getGroup($id)
     {
         return Group::fromID($id, $this->_groupCollection);
+    }
+
+    /**
+     * Get a Post form ID
+     * 
+     * @param string $id Id of the post
+     * 
+     * @return Post Object of the post
+     */
+    public function getPost($id)
+    {
+        return Post::fromID($id, $this->_postCollection);
+    }
+
+    /**
+     * Get a File from the Grid FS
+     * 
+     * @param Mongoid $id Id of the File
+     * 
+     * @return mixed File from the Grid
+     */
+    public function getFile(\Mongoid $id)
+    {
+        return $this->_grid->get($id);
     }
 
     /**
