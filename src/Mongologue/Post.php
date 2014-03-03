@@ -49,14 +49,13 @@ class Post
      */
     public static function getNextPostId(\MongoCollection $counters)
     {
-        $count = $counters.findAndModify(
+        $count = $counters->findAndModify(
             array("id"=>"posts"),
-            array("$inc"=>array("s"=>1)),
+            array('$inc'=>array("s"=>1)),
             null,
             array("upsert"=>true, "new"=>true)
         );
-
-        return $count->s;
+        return $count["s"];
     }
 
     /**
@@ -68,7 +67,7 @@ class Post
     public function __construct(array $post, \MongoCollection $counters)
     {
         $this->_userId = $post["userId"];
-        $this->_datetime = $post["datetime"];
+        //$this->_datetime = $post["datetime"];
         $this->_content = $post["content"];
 
         $this->_counters = $counters;
@@ -78,7 +77,57 @@ class Post
         } else {
             $this->_id = self::getNextPostId($this->_counters);
         }
+        if(isset($post["files"])){
+        	$this->_files = $post["files"];
+        }
+        if(isset($post["parent"])){
+    		$this->_parent= $post["parent"];	
+    	}
+    	if(isset($post["likes"])){
+        	$this->_likes = $post["likes"];	
+        }
+        if(isset($post["comments"])){
+        	$this->_comments = $post["comments"];	
+        }
+        if(isset($post["category"])){
+        	$this->_comments = $post["category"];	
+        }
+        if(isset($post["type"])){
+        	$this->_comments = $post["type"];	
+        }
+        if(isset($post["datetime"])){
+        	$this->_datetime = $post["datetime"];
+        }
 
     }
+
+    /**
+     * Create Post
+     *
+     * @param array $post Details Post to be Created
+     *
+     * @access public
+     * @return bool True if success
+     */
+    /*public function createPost(array $post)
+    {
+        $post = new Post($post, $this->_countersCollection);
+        return Post::savePost($post, $this->_grid, $this->_postCollection);
+    }
+*/
+    public static function savePost(self $post, \MongoCollection $collection)
+    {
+    	$tempPost = $collection->findOne(array("id"=> $post->id()));
+        if ($tempPost) {
+            throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
+        } else {
+            
+            $collection->insert($post->document());
+        }
+
+        return true;
+    }
+
+
 }
 ?>
