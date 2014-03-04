@@ -29,5 +29,6 @@ class Config
     const GROUP_COLLECTION = "groups";
     const COMMENTS_COLLECTION = "comments";
     const CATEGORY_COLLECTION = "category";
+    const INBOX_COLLECTION = "inbox";
 }
 ?>

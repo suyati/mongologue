@@ -56,7 +56,8 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "users",
             "posts",
             "comments",
-            "groups"
+            "groups",
+            "inbox"
         );
 
         $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
@@ -65,8 +66,6 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         foreach ($collectionNames as $key => $collection) {
             $this->assertTrue(in_array($collection, $collections));
         }
-        
-
     }
 
     /**
@@ -88,10 +87,26 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "lastName"=>"Doe"
         );
 
-        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
-        $app->registerUser(
-            new \Mongologue\User($user)
+        $group = array(
+            "id" => 12,
+            "name" => "Grand Slam"
         );
+
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        
+        $app->registerGroup(
+            new \Mongologue\Group($group)
+        );
+
+        $app->registerUser(
+            new \Mongologue\User($user),
+            array($group["id"])
+        );
+
+        $members = $app->getGroupMembers($group["id"]);
+
+        $this->assertContains($user["id"], $members);
 
         foreach ($app->getAllUsers() as $user) {
             $this->assertEquals("John Doe", $user->name());
@@ -169,9 +184,12 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             new \Mongologue\Group($group)
         );
 
+        $groupNames = array();
         foreach ($app->getAllGroups() as $group) {
-            $this->assertEquals("Foo", $group->name());
+            $groupNames[] = $group->name();
         }
+        $this->assertContains("Foo", $groupNames);
+        
     }
     /**
      * Shoud be able follow groups
@@ -216,6 +234,9 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             in_array($group["id"], $followingGroups),
             "Follow not registered at user"
         );
+
+        $followers = $app->getGroupFollowers($group["id"]);
+        $this->assertContains($user["id"], $followers);
 
     }
 
@@ -265,6 +286,135 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($post["content"], $res->getContent());
+
+    }
+
+    /**
+     * Check for Messaging
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldWriteMessagesIntoInboxQueue()
+    {
+        $dbName = self::DB_NAME;
+
+        $user1 = array(
+            "id"=>"1238899884791",
+            "handle"=>"jdoe_1",
+            "emailId"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899884792",
+            "handle"=>"jdoe_2",
+            "emailId"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+        $user3 = array(
+            "id"=>"1238899884793",
+            "handle"=>"jdoe_3",
+            "emailId"=>"jdoe3@x.com",
+            "firstName"=>"John_3",
+            "lastName"=>"Doe"
+        );
+        $user4= array(
+            "id"=>"1238899884794",
+            "handle"=>"jdoe_4",
+            "emailId"=>"jdoe2@x.com",
+            "firstName"=>"John_4",
+            "lastName"=>"Doe"
+        );
+
+        $group1 = array(
+            "id" => 4,
+            "name" => "Cool Group 1"
+        );
+
+        $group2 = array(
+            "id" => 5,
+            "name" => "Cool Group 2"
+        );
+
+        $group3 = array(
+            "id" => 6,
+            "name" => "Cool Group 3"
+        );
+
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        
+        $app->registerGroup(
+            new \Mongologue\Group($group1)
+        );
+        $app->registerGroup(
+            new \Mongologue\Group($group2)
+        );
+        $app->registerGroup(
+            new \Mongologue\Group($group3)
+        );
+
+        $app->registerUser(
+            new \Mongologue\User($user1),
+            array($group1["id"])
+        );
+
+        $app->registerUser(
+            new \Mongologue\User($user2),
+            array($group1["id"])
+        );
+
+        $app->registerUser(
+            new \Mongologue\User($user3),
+            array($group2["id"])
+        );
+
+        $app->registerUser(
+            new \Mongologue\User($user4),
+            array($group3["id"])
+        );
+
+        $app->followUser($user3["id"], $user1["id"]);
+        $app->followUser($user2["id"], $user1["id"]);
+
+        $app->followUser($user1["id"], $user3["id"]);
+
+        $app->followGroup($group3["id"], $user2["id"]);
+        $app->followGroup($group1["id"], $user3["id"]);
+        $app->followGroup($group1["id"], $user4["id"]);
+
+        $post1 = array(
+            "userId"=>$user1["id"],
+            "datetime"=>"12.01.2014",
+            "content"=>"user one",
+            "filesToBeAdded" => array(
+                "tests/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $post2 = array(
+            "userId"=>$user4["id"],
+            "datetime"=>"12.01.2014",
+            "content"=>"user four",
+        );
+
+        $postId1 = $app->createPost($post1);
+        $postId2 = $app->createPost($post2);
+
+        $messages = array("user one", "user four");
+
+        $feed = $app->getFeed($user2["id"]);
+
+        foreach ($feed as $key => $post) {
+            $this->assertEquals($user2["id"], $post["recipient"]);
+            $this->assertContains($post["content"], $messages);
+        }
 
     }
 

@@ -209,7 +209,7 @@ class User
     /**
      * remove a Follower
      * 
-     * @param string          $userId     Add a Follower
+     * @param string          $userId     Remove a Follower
      * @param MongoCollection $collection Collection of Users
      *
      * @return  boolean True if Success
@@ -236,18 +236,18 @@ class User
      */
     public function followGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
     {
-        if(in_array($groupId, $this->_followingGroups)){
+        if (in_array($groupId, $this->_followingGroups)) {
             throw new Exceptions\Group\GroupAlreadyFollowingException("Group with ID $groupId is already being followed");
         } else {
             $group = Group::fromID($groupId, $groupCollection);        
-            
+            $group->addFollower($this->_id, $groupCollection);
             $this->_followingGroups[] = $groupId;
             $this->update($userCollection);
             return true;
         }
     }
 
-     /**
+    /**
      * UnFollow a Group
      * 
      * @param string          $groupId         Id of Group to Follow
@@ -258,13 +258,59 @@ class User
      */
     public function unFollowGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
     {
-        if(in_array($groupId, $this->_followingGroups)){
+        if (in_array($groupId, $this->_followingGroups)) {
             $this->_followingGroups = array_diff($this->_followingGroups, array($groupId));
             $group = Group::fromID($groupId, $groupCollection);            
+            $group->removeFollower($this->_id, $groupCollection);
             $this->update($userCollection);
             return true;
         } else {
             throw new Exceptions\Group\UserNotFollowingThisGroupException("User not following this groups");
+        }
+    }
+
+    /**
+     * Join a Group
+     * 
+     * @param string          $groupId         Id of Group to Join
+     * @param MongoCollection $userCollection  Collection of Users
+     * @param MongoCollection $groupCollection Collection of Groups
+     * 
+     * @return boolean True if Success
+     */
+    public function joinGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
+    {
+        if (in_array($groupId, $this->_groups)) {
+            throw new Exceptions\Group\UserAlreadyMemberException("User is already a member of this group");
+        } else {
+            $group = Group::fromID($groupId, $groupCollection);        
+            $group->addMember($this->_id, $groupCollection);
+            $this->_groups[] = $groupId;
+            $this->update($userCollection);
+            return true;
+        }
+    }
+
+    /**
+     * Leave a Group
+     * 
+     * @param string          $groupId         Id of Group to Leave
+     * @param MongoCollection $userCollection  Collection of Users
+     * @param MongoCollection $groupCollection Collection of Groups
+     * 
+     * @return boolean True if Success
+     */
+    public function leaveGroup($groupId, \MongoCollection $userCollection, \MongoCollection $groupCollection)
+    {
+        if (in_array($groupId, $this->_groups)) {
+
+            $this->_groups = array_diff($this->_groups, array($groupId));
+            $group = Group::fromID($groupId, $groupCollection);            
+            $group->removeMember($this->_id, $groupCollection);
+            $this->update($userCollection);
+            return true;
+        } else {
+            throw new Exceptions\Group\UserNotMemberOfGroup("User is not a member of this groups");
         }
     }
 
@@ -339,6 +385,16 @@ class User
     public function followers()
     {
         return $this->_followers;
+    }
+
+    /**
+     * Get the groups of which the user is a member
+     * 
+     * @return array List of group ids
+     */
+    public function groups()
+    {
+        return $this->_groups;
     }
 
     /**

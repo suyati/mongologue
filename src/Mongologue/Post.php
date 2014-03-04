@@ -33,6 +33,7 @@ class Post
     private $_type;
     private $_datetime;
     private $_category;
+    private $_recipients = array();
 
     private $_filesToBeAdded = array();
 
@@ -58,6 +59,44 @@ class Post
             array("upsert"=>true, "new"=>true)
         );
         return $count["s"];
+    }
+
+    /**
+     * Find Recipients of Post
+     * 
+     * @param self            $post            Post
+     * @param MongoCollection $postCollection  Post Collection
+     * @param MongoCollection $userCollection  User Collection
+     * @param MongoCollection $groupCollection Group Collection
+     * 
+     * @return boolean True if Success
+     */
+    public static function findRecipients(self $post, \MongoCollection $postCollection, \MongoCollection $userCollection, \MongoCollection $groupCollection)
+    {
+        $user = User::fromID($post->getUserId(), $userCollection);
+        $followers = $user->followers();
+        $groups = $user->groups();
+
+        foreach ($groups as $groupId) {
+            $group = Group::fromID($groupId, $groupCollection);
+            $members = $group->getMembers();
+            $groupFollowers = $group->getFollowers();
+
+            $members = array_merge(
+                array_intersect($members, $groupFollowers),
+                array_diff($members, $groupFollowers),
+                array_diff($groupFollowers, $members)
+            );
+
+            $followers = array_merge(
+                array_intersect($members, $followers),
+                array_diff($members, $followers),
+                array_diff($followers, $members)
+            );
+        }
+
+        $post->setRecipients(array_diff($followers, array($user->id())));
+        return true;
     }
 
     /**
@@ -138,6 +177,9 @@ class Post
         }
         if (isset($post["filesToBeAdded"])) {
             $this->_filesToBeAdded = $post["filesToBeAdded"];
+        }
+        if (isset($post["recipients"])) {
+            $this->_recipients = $post["recipients"];
         }
 
     }
@@ -237,7 +279,8 @@ class Post
             "category"=>$this->_category,
             "comments"=>$this->_comments,
             "type"=>$this->_type,
-            "likes"=>$this->_likes
+            "likes"=>$this->_likes,
+            "recipients"=>$this->_recipients
         );
 
         return $document;
@@ -256,6 +299,38 @@ class Post
             array("id"=>$this->_id),
             $this->document()
         );
+    }
+
+    /**
+     * Set Recipients for the Post
+     * 
+     * @param array $recipients List of recipient ids
+     *
+     * @return void
+     */
+    public function setRecipients(array $recipients)
+    {
+        $this->_recipients = $recipients;
+    }
+
+    /**
+     * Get the Recipients of the Post
+     * 
+     * @return array List of Recipient Ids
+     */
+    public function getRecipients()
+    {
+        return $this->_recipients;
+    }
+
+    /**
+     * Get the User Id of the Owner of the Post
+     * 
+     * @return string Id of the User of the Post
+     */
+    public function getUserId()
+    {
+        return $this->_userId;
     }
 }
 ?>

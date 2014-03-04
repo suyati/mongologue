@@ -28,6 +28,8 @@ class Group
     private $_name;
     private $_type;
     private $_parent=array();
+    private $_members = array();
+    private $_followers = array();
 
     /**
      * Create a Group from Id
@@ -49,7 +51,7 @@ class Group
      /**
      * Register a User to the System.
      * 
-     * @param Group            $group       Group Object to be added
+     * @param Group           $group      Group Object to be added
      * @param MongoCollection $collection Collection of Groups
      *
      * @throws DuplicateGroupException If the group id is already added
@@ -98,6 +100,12 @@ class Group
         if (isset($group["parent"])) {
             $this->_parent = $group["parent"];
         }
+        if (isset($group["members"])) {
+            $this->_members = $group["members"];
+        }
+        if (isset($group["followers"])) {
+            $this->_followers = $group["followers"];
+        }
     }
 
     /**
@@ -121,6 +129,109 @@ class Group
     }
 
     /**
+     * Add a Follower
+     * 
+     * @param string          $userId     Add a Follower
+     * @param MongoCollection $collection Collection of Groups
+     *
+     * @return  boolean True if Success
+     */
+    public function addFollower($userId, \MongoCollection $collection)
+    {       
+        $this->_followers[] = $userId;
+        $this->update($collection);
+        return true;
+    }
+
+    /**
+     * Add a Member
+     * 
+     * @param string          $userId     Add a Memeber
+     * @param MongoCollection $collection Collection of Groups
+     *
+     * @return  boolean True if Success
+     */
+    public function addMember($userId, \MongoCollection $collection)
+    {       
+        $this->_members[] = $userId;
+        $this->update($collection);
+        return true;
+    }
+
+    /**
+     * remove a Follower
+     * 
+     * @param string          $userId     Remove a Follower
+     * @param MongoCollection $collection Collection of Groups
+     *
+     * @return  boolean True if Success
+     */
+    public function removeFollower($userId, \MongoCollection $collection)
+    {
+        if (in_array($userId, $this->_followers)) {
+            $this->_followers = array_diff($this->_followers, array($userId));
+            $this->update($collection);
+            return true;
+        } else {
+            throw new Exceptions\Group\FollowerNotFoundException("Follower with ID $userId cannot be found in followers list");
+        }
+    }
+
+    /**
+     * remove a Member
+     * 
+     * @param string          $userId     Remove a Member
+     * @param MongoCollection $collection Collection of Groups
+     *
+     * @return  boolean True if Success
+     */
+    public function removeMember($userId, \MongoCollection $collection)
+    {
+        if (in_array($userId, $this->_members)) {
+            $this->_members = array_diff($this->_members, array($userId));
+            $this->update($collection);
+            return true;
+        } else {
+            throw new Exceptions\Group\MemberNotFoundException("Member with ID $userId cannot be found in member list");
+        }
+    }
+
+    /**
+     * Update the Document for the Group
+     * 
+     * @param MongoCollection $collection Collection of Groups
+     * 
+     * @return void
+     */
+    public function update(\MongoCollection $collection)
+    {
+        $collection->update(
+            array("id"=>$this->_id),
+            $this->document()
+        );
+    }
+
+    /**
+     * Get all Members of Group
+     * 
+     * @return array List of member ids
+     */
+    public function getMembers()
+    {
+        return $this->_members;
+    }
+
+    /**
+     * Get all followers in the Group
+     * 
+     * @return array List of Follower ids
+     */
+    public function getFollowers()
+    {
+        return $this->_followers;
+    }
+
+    /**
      * Convert Group to Document
      * 
      * @return array Document of Group
@@ -131,7 +242,9 @@ class Group
             "id" => $this->_id,
             "name" => $this->_name,
             "type" => $this->_type,
-            "parent" => $this->_parent
+            "parent" => $this->_parent,
+            "members" => $this->_members,
+            "followers" => $this->_followers
         );
 
         return $document;

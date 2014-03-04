@@ -36,6 +36,7 @@ class Mongologue
     private $_commentsCollection;
     private $_postCollection;
     private $_categoryCollection;
+    private $_inboxCollection;
     private $_grid;
     
     /**
@@ -54,6 +55,7 @@ class Mongologue
         $postCollection = Config::POST_COLLECTION;
         $groupCollection = Config::GROUP_COLLECTION;
         $categoryCollection = Config::CATEGORY_COLLECTION;
+        $inboxCollection = Config::INBOX_COLLECTION;
 
         $this->_client = $client;
         $this->_db = $this->_client->$dbName;
@@ -66,6 +68,7 @@ class Mongologue
         $this->_commentsCollection = $this->_db->createCollection($commentCollection);
         $this->_postCollection = $this->_db->createCollection($postCollection);
         $this->_categoryCollection = $this->_db->createCollection($categoryCollection);
+        $this->_inboxCollection = $this->_db->createCollection($inboxCollection);
         $this->_grid = $this->_db->getGridFS();
 
     }
@@ -73,15 +76,19 @@ class Mongologue
     /**
      * Register A user in the System
      * 
-     * @param User $user Details of User to be Registered
-     *
+     * @param User  $user   Details of User to be Registered
+     * @param Array $groups A list of groups that the member is a part of
+     * 
      * @access public
      * @return bool true if success
      */
-    public function registerUser(User $user)
+    public function registerUser(User $user, $groups = array())
     {
-         User::registerUser($user, $this->_userCollection);
-         return true;        
+        User::registerUser($user, $this->_userCollection);
+        foreach ($groups as $groupId) {
+            $user->joinGroup($groupId, $this->_userCollection, $this->_groupCollection);
+        }
+        return true;        
         
     }
 
@@ -94,8 +101,8 @@ class Mongologue
      */
     public function registerGroup(Group $group)
     {       
-            Group::registerGroup($group, $this->_groupCollection);
-            return true;        
+        Group::registerGroup($group, $this->_groupCollection);
+        return true;        
     }
 
     /**
@@ -125,6 +132,8 @@ class Mongologue
         $id = Post::getNextPostId($this->_countersCollection);
         $post["id"] = $id;
         $post = new Post($post);
+        Post::findRecipients($post, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
+        Inbox::writeToInbox($post, $this->_inboxCollection, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
         return Post::savePost($post, $this->_grid, $this->_postCollection);
     }
 
@@ -139,7 +148,7 @@ class Mongologue
      */
     public function followUser($followeeId, $followerId)
     {
-        $user = User::fromId($followerId, $this->_userCollection);
+        $user = User::fromID($followerId, $this->_userCollection);
         return $user->followUser($followeeId, $this->_userCollection);
     }
 
@@ -154,7 +163,7 @@ class Mongologue
      */
     public function unFollowUser($followeeId, $followerId)
     {
-        $user = User::fromId($followerId, $this->_userCollection);
+        $user = User::fromID($followerId, $this->_userCollection);
         return $user->unFollowUser($followeeId, $this->_userCollection);
     }
 
@@ -169,7 +178,7 @@ class Mongologue
      */
     public function followGroup($groupId, $followerId)
     {
-        $user = User::fromId($followerId, $this->_userCollection);
+        $user = User::fromID($followerId, $this->_userCollection);
         return $user->followGroup($groupId, $this->_userCollection, $this->_groupCollection);
     }
 
@@ -184,22 +193,75 @@ class Mongologue
      */
     public function unFollowGroup($groupId, $followerId)
     {
-        $user = User::fromId($followerId, $this->_userCollection);
+        $user = User::fromID($followerId, $this->_userCollection);
         return $user->unFollowGroup($groupId, $this->_userCollection, $this->_groupCollection);
+    }
+
+    /**
+     * Join a Group
+     * 
+     * @param string $userId  Id of the User
+     * @param string $groupId Id of the group
+     * 
+     * @return bool True if success
+     */
+    public function joinGroup($userId, $groupId)
+    {
+        $user = User::fromID($userId, $this->_userCollection);
+        return $user->joinGroup($groupId, $this->_userCollection, $this->_groupCollection);
+    }
+
+    /**
+     * Leave a Group
+     * 
+     * @param string $userId  Id of the User
+     * @param string $groupId Id of the group
+     * 
+     * @return bool True if success
+     */
+    public function leaveGroup($userId, $groupId)
+    {
+        $user = User::fromID($userId, $this->_userCollection);
+        return $user->leaveGroup($groupId, $this->_userCollection, $this->_groupCollection);
+    }
+
+    /**
+     * Get Members of a group
+     * 
+     * @param string $groupId Id of the group
+     * 
+     * @return array List of member ids
+     */
+    public function getGroupMembers($groupId)
+    {
+        return Group::fromID($groupId, $this->_groupCollection)->getMembers();
+    }
+
+    /**
+     * Get Followers of a group
+     * 
+     * @param string $groupId Id of the group
+     * 
+     * @return array List of member ids
+     */
+    public function getGroupFollowers($groupId)
+    {
+        return Group::fromID($groupId, $this->_groupCollection)->getFollowers();
     }
 
     /**
      * Get the Feed for a User
      * 
-     * @param string $userId Id of the User for whom the feed 
-     *                        is needed
+     * @param string  $userId Id of the User
+     * @param integer $limit  Max number of Posts
+     * @param integer $since  Since which posts
      *
      * @access public
      * @return array JSON Feed for the User
      */
-    public function getFeed($userId)
+    public function getFeed($userId, $limit=null, $since=null)
     {
-        return User::getFeed($userId, $this->_db, $this->_postCollection);
+        return Inbox::getMessages($userId, $this->_inboxCollection, $limit, $since);
     }
 
     /**
