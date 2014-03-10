@@ -269,7 +269,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "datetime"=>"12.01.2014",
             "content"=>"hello testing",
             "filesToBeAdded" => array(
-                __DIR__."tests/resources/sherlock.jpg"=>array(
+                __DIR__."/resources/sherlock.jpg"=>array(
                     "type"=>"jpeg",
                     "size"=>"100"
                 )
@@ -282,7 +282,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         
         foreach ($res->getFiles() as $key => $id) {
             $file = $app->getFile($id);
-            $this->assertEquals("tests/resources/sherlock.jpg", $file->getFileName());
+            $this->assertEquals(__DIR__."/resources/sherlock.jpg", $file->getFileName());
         }
 
         $this->assertEquals($post["content"], $res->getContent());
