@@ -385,13 +385,13 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         $app->followGroup($group3["id"], $user2["id"]);
         $app->followGroup($group1["id"], $user3["id"]);
         $app->followGroup($group1["id"], $user4["id"]);
-
+        
         $post1 = array(
             "userId"=>$user1["id"],
             "datetime"=>"12.01.2014",
             "content"=>"user one",
             "filesToBeAdded" => array(
-                "tests/resources/sherlock.jpg"=>array(
+                __DIR__."/resources/sherlock.jpg"=>array(
                     "type"=>"jpeg",
                     "size"=>"100"
                 )
@@ -404,10 +404,15 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "content"=>"user four",
         );
 
+
         $postId1 = $app->createPost($post1);
         $postId2 = $app->createPost($post2);
 
         $messages = array("user one", "user four");
+
+        $res = $app->getPost($postId2);
+
+        $this->assertEquals($post2["content"], $res->getContent());
 
         $feed = $app->getFeed($user2["id"]);
 
