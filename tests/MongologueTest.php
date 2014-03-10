@@ -269,7 +269,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "datetime"=>"12.01.2014",
             "content"=>"hello testing",
             "filesToBeAdded" => array(
-                "tests/resources/sherlock.jpg"=>array(
+                __DIR__."tests/resources/sherlock.jpg"=>array(
                     "type"=>"jpeg",
                     "size"=>"100"
                 )
