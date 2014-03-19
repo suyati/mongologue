@@ -16,6 +16,7 @@ use \Mongologue\User;
 use \Mongologue\Post;
 use \Mongologue\Group;
 use \Mongologue\Category;
+use \Mongologue\Premadepost;
 
 /**
  * Core Mongologue Class
@@ -38,6 +39,7 @@ class Mongologue
     private $_categoryCollection;
     private $_inboxCollection;
     private $_grid;
+    private $_premadepostCollection;
     
     /**
      * Constructor of the Class
@@ -56,6 +58,7 @@ class Mongologue
         $groupCollection = Config::GROUP_COLLECTION;
         $categoryCollection = Config::CATEGORY_COLLECTION;
         $inboxCollection = Config::INBOX_COLLECTION;
+        $premadepostCollection = Config::PREMADEPOST_COLLECTION;
 
         $this->_client = $client;
         $this->_db = $this->_client->$dbName;
@@ -69,8 +72,23 @@ class Mongologue
         $this->_postCollection = $this->_db->createCollection($postCollection);
         $this->_categoryCollection = $this->_db->createCollection($categoryCollection);
         $this->_inboxCollection = $this->_db->createCollection($inboxCollection);
+        $this->_premadepostCollection = $this->_db->createCollection($premadepostCollection);
         $this->_grid = $this->_db->getGridFS();
 
+    }
+    /**
+     * [userCollection description]
+     * @return [type] [description]
+     */
+    public function userCollection() {
+        return $this->_userCollection;
+    }
+    /**
+     * [userCollection description]
+     * @return [type] [description]
+     */
+    public function postCollection() {
+        return $this->_postCollection;
     }
 
     /**
@@ -130,12 +148,34 @@ class Mongologue
     {
         $user = User::fromID($post["userId"], $this->_userCollection);
         $id = Post::getNextPostId($this->_countersCollection);
-        $post["id"] = $id;
+        $post["id"] = (string)$id;
         $post = new Post($post);
         Post::findRecipients($post, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
         Inbox::writeToInbox($post, $this->_inboxCollection, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
         return Post::savePost($post, $this->_grid, $this->_postCollection);
+        
     }
+
+    /**
+     * Create Comment
+     *
+     * @param array $comment Details of Comment to be Created
+     *
+     * @access public
+     * @return bool True if success
+     */
+    public function createComment(array $comment)
+    {
+        $user = User::fromID($comment["userId"], $this->_userCollection);
+        $id = Post::getNextPostId($this->_countersCollection);
+        $comment["id"] = (string)$id;
+        $comment = new Post($comment);
+        Post::findRecipients($comment, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
+        Inbox::writeToInbox($comment, $this->_inboxCollection, $this->_postCollection, $this->_userCollection, $this->_groupCollection);
+        return Post::savePost($comment, $this->_grid, $this->_postCollection);
+        
+    }
+
 
     /**
      * Follow a User
@@ -362,13 +402,13 @@ class Mongologue
     /**
      * Get a Post form ID
      * 
-     * @param string $id Id of the post
+     * @param string $postId Id of the post
      * 
      * @return Post Object of the post
      */
-    public function getPost($id)
+    public function getPost($postId)
     {
-        return Post::fromID($id, $this->_postCollection);
+        return Post::fromID($postId, $this->_postCollection);
     }
 
     /**
@@ -411,6 +451,118 @@ class Mongologue
     public function getCategory($id)
     {
         return Category::fromID($id, $this->_categoryCollection);
+    }
+
+    /**
+     * Register A Premadepost 
+     * 
+     * @param Premadepost $premadepost Premadepost to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function registerPremadepost(Premadepost $premadepost)
+    {       
+            Premadepost::registerPremadepost($premadepost, $this->_premadepostCollection);
+            return true;        
+    }
+
+    /**
+     * Get All the Premadeposts
+     * 
+     * @return array List of all Premadeposts
+     */
+    public function getAllPremadepost()
+    {
+        $premadeposts = array();
+
+        $cursor = $this->_premadepostCollection->find();
+
+        foreach ($cursor as $document) {
+            $premadeposts[] = Premadepost::fromDocument($document);
+        }
+
+        return $premadeposts;
+    }
+
+     /**
+     * Like User Post
+     * 
+     * @param string $postId      Id of the User post
+     * 
+     * @param string $likedUserId Id of the post liked user.
+     *
+     * @access public
+     * @return bool True if Success
+     */
+    public function likePost($postId, $likedUserId)
+    {
+        $post = Post::fromID($postId, $this->_postCollection);
+        return $post->likePost($likedUserId, $this->_postCollection, $this->_userCollection);
+    }
+
+    /**
+     * Like User Post
+     * 
+     * @param string $postId Id of the User post
+     *
+     * @access public
+     * @return Array of UserId
+     */
+    public function getLikes($postId)
+    {
+        return Post::fromID($postId, $this->_postCollection);
+    }
+
+
+    /**
+     * Like User Post
+     * 
+     * @param string $postId Id of the User post
+     *
+     * @access public
+     * @return Array count of UserId
+     */
+    public function getLikesCount($postId)
+    {
+        return Post::fromID($postId, $this->_postCollection);
+    }
+
+    /**
+     * Get Comments of Post
+     * 
+     * @param string $postId Id of the User post
+     *
+     * @access public
+     * @return Array of CommentIds
+     */
+    public function getComments($postId)
+    {
+        return Post::fromID($postId, $this->_postCollection);
+    }
+
+    /**
+     * Get The Mutual Friends
+     * 
+     * @param string $userId User Id 
+     * 
+     * @access public
+     * @return Array of the Mutual Friends
+     */
+    public function getMutualfriends($userId)
+    {
+        return User::fromID($userId, $this->_userCollection);
+    }
+
+    /**
+     * Get the Mutual Likes
+     * 
+     * @param string $userId User Id
+     * 
+     * @return Array of Mutual Likes
+     */
+    public function getMutualLikes($userId)
+    {
+        return User::fromID($userId, $this->_userCollection);
     }
 }
 ?>

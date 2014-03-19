@@ -30,5 +30,6 @@ class Config
     const COMMENTS_COLLECTION = "comments";
     const CATEGORY_COLLECTION = "category";
     const INBOX_COLLECTION = "inbox";
+    const PREMADEPOST_COLLECTION = "premadepost";
 }
 ?>

@@ -31,6 +31,7 @@ class Post
     private $_likes = array();
     private $_comments = array();
     private $_type;
+    private $_postType;
     private $_datetime;
     private $_category;
     private $_recipients = array();
@@ -133,7 +134,7 @@ class Post
             throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
         } else {
             if ($post->isComment()) {
-                $parent = self::fromID($post->parent());
+                $parent = self::fromID($post->parent(), $collection);
                 $parent->addComment($post->id());
                 $parent->update($collection);
             }
@@ -170,10 +171,13 @@ class Post
             $this->_comments = $post["comments"];   
         }
         if (isset($post["category"])) {
-            $this->_comments = $post["category"];   
+            $this->_category = $post["category"];   
         }
         if (isset($post["type"])) {
-            $this->_comments = $post["type"];   
+            $this->_type = $post["type"];   
+        }
+        if (isset($post["postType"])) {
+            $this->_postType = $post["postType"];   
         }
         if (isset($post["filesToBeAdded"])) {
             $this->_filesToBeAdded = $post["filesToBeAdded"];
@@ -192,7 +196,7 @@ class Post
      * @return boolean True of Success
      */
     public function saveFiles(\MongoGridFS $grid)
-    {
+    {   
         foreach ($this->_filesToBeAdded as $name => $attributes) {
             $this->_files[] = $grid->storeFile($name, $attributes);
         }
@@ -235,7 +239,7 @@ class Post
      */
     public function isComment()
     {
-        if ($this->_type=="comment")
+        if ($this->_postType=="comment")
             return true;
         return false;
     }
@@ -279,8 +283,10 @@ class Post
             "category"=>$this->_category,
             "comments"=>$this->_comments,
             "type"=>$this->_type,
+            "postType"=>$this->_postType,
             "likes"=>$this->_likes,
             "recipients"=>$this->_recipients
+           
         );
 
         return $document;
@@ -331,6 +337,70 @@ class Post
     public function getUserId()
     {
         return $this->_userId;
+    }
+
+    /**
+     * Like user post
+     *   
+     * @param string  $likedUserId  Id of post liked user
+     * @param MongoCollection $postCollection Collections of posts 
+     * @param MongoCollection $userCollection Collections of user
+     * 
+     * @return bool True if success
+     */
+    public function likePost($likedUserId, \MongoCollection $postCollection, \MongoCollection $userCollection)
+    {   
+        if (in_array($likedUserId, $this->_likes)) {    
+            throw new Exceptions\Post\AlreadyLikesThisPostException("User with ID $likedUserId is already being liked this post");
+        } else {
+            User::addLikedPosts($likedUserId, $this->_id, $userCollection);
+            $this->_likes[] = $likedUserId;
+            $this->update($postCollection);
+            return true;
+        }
+    }
+
+    /**
+     * Like user count
+     * Get the Like Count
+     * 
+     * @return bool True if success
+     */
+    public function likesCount()
+    {
+        return count($this->_likes);
+    }
+    
+    /**
+     * Get the Liked Users Id
+     * 
+     * @return Array List of Liked Users
+     */
+    public function likedUsers()
+    {
+        return $this->_likes;
+    }
+
+    /**
+     * Comment Count
+     * Get the User Id of the Owner of the Post
+     * 
+     * @return bool True if success
+     */
+    public function commentCount()
+    {
+        return count($this->_comments);
+    }
+
+    /**
+     * Comment Ids
+     * Get the Comment Ids 
+     * 
+     * @return Array of Comment 
+     */
+    public function commentIds()
+    {
+        return $this->_comments;
     }
 }
 ?>

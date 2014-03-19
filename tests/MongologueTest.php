@@ -13,6 +13,8 @@ namespace Mongologue\Tests\Unit;
 
 use \Mongologue\Config;
 
+// require_once 'User.php';
+
 /**
  * Class Testing Mongologue 
  *
@@ -118,7 +120,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
      * A USer can follow other Users
      *
      * @test
-     * 
+     * @expectedException Mongologue\Exceptions\User\AlreadyFollowingException
      * @return void
      */
     public function shouldBeAbleToFollowUSer()
@@ -161,7 +163,49 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             in_array($user2["id"], $following),
             'Follow not Registered at Follower'
         );
+
+        $this->assertTrue($app->unFollowUser($user2["id"], $user1["id"]));
+        $this->assertTrue($app->followUser($user2["id"], $user1["id"]));
+        $follow = $app->followUser($user2["id"], $user1["id"]);
+
+        
     }
+
+    /**
+     * A User cannot unFollow Users when they have not following
+     *
+     * @test
+     * @expectedException Mongologue\Exceptions\User\NotFollowingException
+     * @return void
+     */
+    public function shouldBeAbleToUnFollowUSer()
+    {
+        $dbName = self::DB_NAME;
+
+        $user1 = array(
+            "id"=>"1238899884845",
+            "handle"=>"jack1",
+            "firstName"=>"Don1",
+            "lastName"=>"Bos1"
+        );
+        $user2 = array(
+            "id"=>"1238899884846",
+            "handle"=>"roro1",
+            "firstName"=>"Zoro1",
+            "lastName"=>"Roro1"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerUser(
+            new \Mongologue\User($user1)
+        );
+        $app->registerUser(
+            new \Mongologue\User($user2)
+        );
+        //user
+        $this->assertTrue($app->unFollowUser($user2["id"], $user1["id"]));
+    }
+
 
     /**
      * Should Be Able To Register Group
@@ -189,6 +233,35 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             $groupNames[] = $group->name();
         }
         $this->assertContains("Foo", $groupNames);
+        
+    }
+
+    /**
+     * Should Be Able To Register Category
+     *
+     * @test
+     * 
+     * @return [type] [description]
+     */
+    public function shouldBeAbleToRegisterCategory()
+    {
+        $dbName = self::DB_NAME;
+
+        $category = array(
+            "id" => 1,
+            "name" => "New Category"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerCategory(
+            new \Mongologue\Category($category)
+        );
+
+        $categoryNames = array();
+        foreach ($app->getAllCategories() as $category) {
+            $categoryNames[] = $category->name();
+        }
+        $this->assertContains("New Category", $categoryNames);
         
     }
     /**
@@ -237,6 +310,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
         $followers = $app->getGroupFollowers($group["id"]);
         $this->assertContains($user["id"], $followers);
+        $this->assertTrue($app->unFollowGroup($group["id"], $user["id"]));
 
     }
 
@@ -404,14 +478,25 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "content"=>"user four",
         );
 
+        $post3 = array(
+            "userId"=>$user2["id"],
+            "datetime"=>"14.03.2014",
+            "content"=>"user two",
+            "filesToBeAdded" => array(
+                __DIR__."/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
 
         $postId1 = $app->createPost($post1);
         $postId2 = $app->createPost($post2);
+        $postId3 = $app->createPost($post3);
 
         $messages = array("user one", "user four");
 
         $res = $app->getPost($postId2);
-
         $this->assertEquals($post2["content"], $res->getContent());
 
         $feed = $app->getFeed($user2["id"]);
@@ -423,5 +508,95 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Should Be Able To Add PremadePosts
+     *
+     * @test
+     * 
+     * @return [type] [description]
+     */
+    public function shouldBeAbleToAddPremadePosts()
+    {
+        $dbName = self::DB_NAME;
+
+        $premadepost = array(
+            "id" => 1,
+            "name" => "New Premade Post"
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerPremadepost(
+            new \Mongologue\Premadepost($premadepost)
+        );
+
+        $premadePosts = array();
+        foreach ($app->getAllPremadepost() as $premadepost) {
+            $premadePosts[] = $premadepost->name();
+        }
+        $this->assertContains("New Premade Post", $premadePosts);
+        
+    }
+
+    /**
+     * Should Be Able To Likepost
+     *
+     * @test
+     * 
+     * @return [type] [description]
+     */
+    public function shouldBeAbleToLikePosts()
+    {
+        $dbName = self::DB_NAME;
+
+        $user1 = array(
+            "id"=>"123456789",
+            "handle"=>"jdoe_1",
+            "emailId"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+
+        $user2 = array(
+            "id"=>"1238899884782",
+            "handle"=>"jdoe_2",
+            "emailId"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+
+        $post1 = array(
+            "userId"=>"123456789",
+            "datetime"=>"14.03.2014",
+            "content"=>"user one's post",
+            "filesToBeAdded" => array(
+                __DIR__."/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerUser(
+            new \Mongologue\User($user1)
+        );
+        $app->registerUser(
+            new \Mongologue\User($user2)
+        );
+        $postId1 = $app->createPost($post1);
+        $res = $app->getPost($postId1);
+        $this->assertEquals($post1["content"], $res->getContent());
+        
+        $this->assertTrue($app->likePost($postId1, $user2["id"]));
+
+        $user = \Mongologue\User::fromID($user2["id"], $app->userCollection());
+        
+        $this->assertContains($postId1, $user->getPostLikes());
+
+        $post = \Mongologue\Post::fromID($postId1, $app->postCollection());
+ 
+        $this->assertContains($user2["id"], $post->likedUsers());
+
+    }
 }
 ?>

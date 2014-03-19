@@ -36,9 +36,10 @@ class User
     private $_friends = array();
     private $_likePages = array();
     private $_followers = array();
-    private $_followingUsers = array();
+    private $_followingUsers = array();    
     private $_groups = array();
     private $_followingGroups = array();
+    private $_likedPosts = array();
 
     /**
      * Create a User Instance from Documetn
@@ -64,7 +65,7 @@ class User
      * @return User Instance of a User
      */
     public static function fromID($userId,\MongoCollection $collection)
-    {
+    {   
         $user = $collection->findOne(array("id"=> $userId));
         if($user)
             return new self($user);
@@ -72,6 +73,33 @@ class User
             throw new Exceptions\User\UserNotFoundException("No Such User");
             
     }
+
+    /**
+     * Addliked Posts in to user collection
+     * 
+     * @param string          $likedUserId    Id of the User
+     * @param string          $likedPostId    Id of the Post
+     * @param MongoCollection $userCollection user collection 
+     *
+     * @throws UserNotFoundException if the user with the provided id does not exist
+     *                               in the colleciton.
+     *                               
+     * @return User Instance of a User
+     */
+    public static function addLikedPosts($likedUserId, $likedPostId, \MongoCollection $userCollection)
+    {
+        $user = User::fromID($likedUserId, $userCollection);
+        if (in_array($likedPostId, $user->_likedPosts)) {    
+            throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
+        } else {
+                    
+            $user->_likedPosts[] = $likedPostId;
+            $user->update($userCollection);
+            return true;
+        }
+    }
+
+
 
     /**
      * Register a User to the System.
@@ -135,6 +163,9 @@ class User
         if (isset($user["followingGroups"])) {
             $this->_followingGroups = $user["followingGroups"];
         }
+        if (isset($user["likedPosts"])) {
+            $this->_likedPosts = $user["likedPosts"];
+        }
     }
 
     /**
@@ -157,7 +188,8 @@ class User
             "groups" => $this->_groups,
             "followers" => $this->_followers,
             "followingGroups" => $this->_followingGroups,
-            "followingUsers" => $this->_followingUsers
+            "followingUsers" => $this->_followingUsers,
+            "likedPosts" => $this->_likedPosts
         );
 
         return $document;
@@ -416,5 +448,35 @@ class User
     {
         return $this->_followingGroups;
     }
+
+    /**
+     * Get Mutual Friends
+     * 
+     * @return Array list of Mutual friends
+     * 
+     */
+    public function getFriends()
+    {
+        return $this->_friends;
+    }
+
+    /**
+     * Get Users Like Pages
+     * 
+     * @return Array of Mutual Like Pages.
+     */
+    public function getLikes()
+    {
+        return $this->_likePages;
+    }
+    /**
+     * Get Users Like Posts
+     * 
+     * @return Array of Liked Posts.
+     */
+    public function getPostLikes()
+    {
+        return $this->_likedPosts;
+    }    
 }
 ?>
