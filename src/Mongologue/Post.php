@@ -17,6 +17,7 @@ namespace Mongologue;
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
+ * @author   @naveenbos <nmohanan@suyati.com>
  * @license  NONE http://suyati.com
  * @version  0.1.1
  * @link     http://suyati.com
@@ -342,7 +343,7 @@ class Post
     /**
      * Like user post
      *   
-     * @param string  $likedUserId  Id of post liked user
+     * @param string $likedUserId  Id of post liked user  
      * @param MongoCollection $postCollection Collections of posts 
      * @param MongoCollection $userCollection Collections of user
      * 
@@ -401,6 +402,25 @@ class Post
     public function commentIds()
     {
         return $this->_comments;
+    }
+
+    /**
+     * getComment 
+     * Get the Comment details
+     * 
+     * @param MongoCollection $postCollection contain post collection
+     * 
+     * @return Array of Comments 
+     */
+    public function getComments(\MongoCollection $postCollection)
+    {
+        $comments = array();
+        $commentCount = count($this->_comments);
+        foreach ($this->_comments as $commentId) {
+            $comment = Post::fromID($commentId, $postCollection);
+            $comments[] = $comment->document();
+        }
+        return $comments;
     }
 }
 ?>

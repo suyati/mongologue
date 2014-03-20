@@ -510,7 +510,8 @@ class Mongologue
      */
     public function getLikes($postId)
     {
-        return Post::fromID($postId, $this->_postCollection);
+        $post = Post::fromID($postId, $this->_postCollection);
+        return $post->likedUsers();
     }
 
 
@@ -537,7 +538,8 @@ class Mongologue
      */
     public function getComments($postId)
     {
-        return Post::fromID($postId, $this->_postCollection);
+        $post = Post::fromID($postId, $this->_postCollection);
+        return $post->getComments($this->_postCollection);
     }
 
     /**

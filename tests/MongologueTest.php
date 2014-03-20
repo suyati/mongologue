@@ -332,12 +332,20 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
             "firstName"=>"Rudolph",
             "lastName"=>"RedNose"
         );
-
+        $user2 = array(
+            "id"=>"1238899884580",
+            "handle"=>"Rijo",
+            "emailId" => "rijo@pulp.fiction",
+            "firstName"=>"Rijo",
+            "lastName"=>"Rijos"
+        );
         $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
         $app->registerUser(
             new \Mongologue\User($user)
         );
-
+        $app->registerUser(
+            new \Mongologue\User($user2)
+        );
         $post = array(
             "userId"=>"1238899884579",
             "datetime"=>"12.01.2014",
@@ -361,6 +369,26 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($post["content"], $res->getContent());
 
+        $comment = array(
+            "parent"=>$postId,
+            "userId"=>"1238899884580",
+            "datetime"=>"12.01.2014",
+            "content"=>"hello comment testing",
+            'postType' => "comment",
+            "filesToBeAdded" => array(
+                __DIR__."/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+            );
+        $postId = $app->createComment($comment);
+        $res = $app->getPost($postId);
+        foreach ($res->getFiles() as $key => $id) {
+            $file = $app->getFile($id);
+            $this->assertEquals(__DIR__."/resources/sherlock.jpg", $file->getFileName());
+        }
+        $this->assertEquals($comment["content"], $res->getContent());
     }
 
     /**
@@ -537,11 +565,70 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         
     }
 
+     /**
+     * Should Be Able To throw Post not found exception
+     *
+     * @test
+     *
+     * @expectedException Mongologue\Exceptions\Post\PostNotFoundException
+     * @return [type] [description]
+     */
+    public function shouldBeThrowpPostNotFoundException()
+    {
+        $dbName = self::DB_NAME;
+        $user = array(
+            "id"=>"1238899884581",
+            "handle"=>"rudolph",
+            "emailId" => "rudy@pulp.fiction",
+            "firstName"=>"Rudolph",
+            "lastName"=>"RedNose"
+        );
+        $user2 = array(
+            "id"=>"1238899884582",
+            "handle"=>"Rijo",
+            "emailId" => "rijo@pulp.fiction",
+            "firstName"=>"Rijo",
+            "lastName"=>"Rijos"
+        );
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+        $app->registerUser(
+            new \Mongologue\User($user)
+        );
+        $app->registerUser(
+            new \Mongologue\User($user2)
+        );
+        $post = array(
+            "userId"=>"1238899884579",
+            "datetime"=>"12.01.2014",
+            "content"=>"hello testing",
+            "filesToBeAdded" => array(
+                __DIR__."/resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $postId = $app->createPost($post);
+
+        $res = $app->getPost($postId);
+        
+        foreach ($res->getFiles() as $key => $id) {
+            $file = $app->getFile($id);
+            $this->assertEquals(__DIR__."/resources/sherlock.jpg", $file->getFileName());
+        }
+
+        $this->assertEquals($post["content"], $res->getContent());
+        $res = $app->getPost("1234");
+    }
+
+
     /**
      * Should Be Able To Likepost
      *
      * @test
-     * 
+     *
+     * @expectedException Mongologue\Exceptions\Post\AlreadyLikesThisPostException
      * @return [type] [description]
      */
     public function shouldBeAbleToLikePosts()
@@ -597,6 +684,7 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
  
         $this->assertContains($user2["id"], $post->likedUsers());
 
+        $this->assertTrue($app->likePost($postId1, $user2["id"]));
     }
 }
 ?>

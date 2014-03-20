@@ -20,6 +20,7 @@ use \Mongologue\Exceptions;
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
+ * @author   @naveenbos <nmohanan@suyati.com>
  * @license  NONE http://suyati.com
  * @version  0.1.1
  * @link     http://suyati.com
