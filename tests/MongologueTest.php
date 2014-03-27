@@ -227,12 +227,9 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
         $app->registerGroup(
             new \Mongologue\Group($group)
         );
-
-        $groupNames = array();
-        foreach ($app->getAllGroups() as $group) {
-            $groupNames[] = $group->name();
-        }
-        $this->assertContains("Foo", $groupNames);
+        $savedGroup = $app->getGroup($group["id"]);
+        
+        $this->assertEquals("Foo", $savedGroup->name());
         
     }
 
