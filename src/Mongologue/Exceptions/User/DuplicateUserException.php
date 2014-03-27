@@ -21,14 +21,14 @@ namespace Mongologue\Exceptions\User;
  */
 class DuplicateUserException extends \Exception
 {
-	/**
+    /**
      * Constructor for custom Exception
      * 
      * @param string    $message  Message for the Exception
      * @param integer   $code     Exception Code
      * @param Exception $previous Prevoious exception if any
      */
-    public function __construct($message, $code=302, \Exception $previous = null)
+    public function __construct($message, $code=321, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
