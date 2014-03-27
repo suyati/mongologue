@@ -28,7 +28,7 @@ class DuplicateUserException extends \Exception
      * @param integer   $code     Exception Code
      * @param Exception $previous Prevoious exception if any
      */
-    public function __construct($message, $code=321, \Exception $previous = null)
+    public function __construct($message, $code=321,\Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
