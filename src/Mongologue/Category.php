@@ -69,6 +69,66 @@ class Category
         return true;
     }
 
+    /**
+     * Update a Category to the System.
+     * 
+     * @param Category        $category           Category Object to be added
+     * @param MongoCollection $categoryCollection Collection of Categorys
+     *
+     * @throws CategoryNotFoundException If the category id not found
+     * 
+     * @return boolean True if Update happens
+     */
+    public static function updateCategory(self $category, \MongoCollection $categoryCollection)
+    {
+        $tempCategory = Category::fromID($category->id(), $categoryCollection);
+        if (!empty($tempCategory)) {
+            $tempCategory->_name = $category->name();
+            $tempCategory->update($categoryCollection);
+        } else {
+            throw new Exceptions\Category\CategoryNotFoundException("Category Not Found");
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove a Category to the System.
+     * 
+     * @param string          $categoryId         Category Object to be added
+     * @param MongoCollection $categoryCollection Collection of Categorys
+     *
+     * @throws CategoryNotFoundException If the category id not found
+     * 
+     * @return boolean True if Update happens
+     */
+    public static function removeCategory($categoryId, \MongoCollection $categoryCollection)
+    {
+        $tempCategory = Category::fromID($categoryId, $categoryCollection);
+        if (!empty($tempCategory)) {
+            $categoryCollection->remove(array("id" => $tempCategory->id()), array("justOne" => true));
+        } else {
+            throw new Exceptions\Category\CategoryNotFoundException("Category Not Found");
+        }
+
+        return true;
+    }
+
+    /**
+     * Update the Document for the Category
+     * 
+     * @param MongoCollection $collection Collection of Categorys
+     * 
+     * @return void
+     */
+    public function update(\MongoCollection $collection)
+    { 
+        $collection->update(
+            array("id"=>$this->_id),
+            $this->document()
+        );
+    }
+
      /**
      * Create Category Object from Document
      * 

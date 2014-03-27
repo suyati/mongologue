@@ -49,7 +49,7 @@ class Group
     }
 
      /**
-     * Register a User to the System.
+     * Register a Group to the System.
      * 
      * @param Group           $group      Group Object to be added
      * @param MongoCollection $collection Collection of Groups
@@ -67,6 +67,51 @@ class Group
         } else {
             if($tempGroup=="")
             $collection->insert($group->document());
+        }
+
+        return true;
+    }
+
+    /**
+     * Update a Group to the System.
+     * 
+     * @param Group           $group           Group Object to be added
+     * @param MongoCollection $groupCollection Collection of Groups
+     *
+     * @throws GroupNotFoundException If the group id not found
+     * 
+     * @return boolean True if Update happens
+     */
+    public static function updateGroup(self $group, \MongoCollection $groupCollection)
+    {
+        $tempGroup = Group::fromID($group->id(), $groupCollection);
+        if (!empty($tempGroup)) {
+            $tempGroup->_name = $group->name();
+            $tempGroup->update($groupCollection);
+        } else {
+            throw new Exceptions\Group\GroupNotFoundException("Group Not Found");
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove a Group to the System.
+     * 
+     * @param string          $groupId         Group Object to be added
+     * @param MongoCollection $groupCollection Collection of Groups
+     *
+     * @throws GroupNotFoundException If the group id not found
+     * 
+     * @return boolean True if Update happens
+     */
+    public static function removeGroup($groupId, \MongoCollection $groupCollection)
+    {
+        $tempGroup = Group::fromID($groupId, $groupCollection);
+        if (!empty($tempGroup)) {
+            $groupCollection->remove(array("id" => $tempGroup->id()), array("justOne" => true));
+        } else {
+            throw new Exceptions\Group\GroupNotFoundException("Group Not Found");
         }
 
         return true;
@@ -204,7 +249,7 @@ class Group
      * @return void
      */
     public function update(\MongoCollection $collection)
-    {
+    { 
         $collection->update(
             array("id"=>$this->_id),
             $this->document()

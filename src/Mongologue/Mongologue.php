@@ -124,6 +124,32 @@ class Mongologue
     }
 
     /**
+     * Update A Group 
+     * 
+     * @param Group $group Group to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function updateGroup(Group $group)
+    {       
+        Group::updateGroup($group, $this->_groupCollection);
+        return true;        
+    }
+
+    /**
+     * Remove A Group 
+     * 
+     * @param string $groupId Group to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function removeGroup($groupId)
+    {       
+        Group::removeGroup($groupId, $this->_groupCollection);
+        return true;        
+    }
+
+    /**
      * Register A Category 
      * 
      * @param Category $category Category to be Registered
@@ -135,6 +161,34 @@ class Mongologue
             Category::registerCategory($category, $this->_categoryCollection);
             return true;        
     }
+
+
+    /**
+     * Update A Category 
+     * 
+     * @param Category $category Category to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function updateCategory(Category $category)
+    {       
+        Category::updateCategory($category, $this->_categoryCollection);
+        return true;        
+    }
+
+    /**
+     * Remove A Category 
+     * 
+     * @param string $categoryId Category to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function removeCategory($categoryId)
+    {       
+        Category::removeCategory($categoryId, $this->_categoryCollection);
+        return true;        
+    }
+
 
     /**
      * Create Post
@@ -371,14 +425,17 @@ class Mongologue
 
     /**
      * Get All the Groups
+     *
+     * @param integer $page page number
+     * @param integer $rows per page
      * 
      * @return array List of all groups
      */
-    public function getAllGroups()
+    public function getAllGroups($page, $rows)
     {
         $groups = array();
 
-        $cursor = $this->_groupCollection->find();
+        $cursor = $this->_groupCollection->find()->skip(($page-1)*$rows)->limit($rows);
 
         foreach ($cursor as $document) {
             $groups[] = Group::fromDocument($document);
@@ -465,6 +522,35 @@ class Mongologue
             Premadepost::registerPremadepost($premadepost, $this->_premadepostCollection);
             return true;        
     }
+
+
+    /**
+     * Update A Premadepost 
+     * 
+     * @param Premadepost $premadepost Premadepost to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function updatePremadepost(Premadepost $premadepost)
+    {       
+        Premadepost::updatePremadepost($premadepost, $this->_premadepostCollection);
+        return true;        
+    }
+
+    /**
+     * Remove A Premadepost 
+     * 
+     * @param string $premadepostId Premadepost to be Registered
+     * 
+     * @return bool true if success
+     */
+    public function removePremadepost($premadepostId)
+    {       
+        Premadepost::removePremadepost($premadepostId, $this->_premadepostCollection);
+        return true;        
+    }
+    
+
 
     /**
      * Get All the Premadeposts
