@@ -277,6 +277,21 @@ class Mongologue
     }
 
     /**
+     * Follow a Group
+     * 
+     * @access public
+     * @return bool True if Success
+     */
+    public function followGroups($group)
+    {
+        $user = User::fromID($group["id"], $this->_userCollection);
+        $groupIds = $group["groupId"];
+        foreach ($groupIds as $groupId) {
+            $user->followGroup($groupId, $this->_userCollection, $this->_groupCollection);
+        }
+    }
+
+    /**
      * unFollow a Group
      * 
      * @param string $groupId    Id of the Group to be followed
