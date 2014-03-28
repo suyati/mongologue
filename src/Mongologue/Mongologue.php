@@ -490,9 +490,9 @@ class Mongologue
      * 
      * @return mixed File from the Grid
      */
-    public function getFile(\Mongoid $id)
+    public function getFile(\MongoId $id)
     {
-        return $this->_grid->get($id);
+        return $this->_grid->findOne(array('_id' =>$id));;
     }
 
     /**
