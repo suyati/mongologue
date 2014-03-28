@@ -35,6 +35,7 @@ class Post
     private $_postType;
     private $_datetime;
     private $_category;
+    private $_timer;
     private $_recipients = array();
 
     private $_filesToBeAdded = array();
@@ -174,6 +175,9 @@ class Post
         if (isset($post["category"])) {
             $this->_category = $post["category"];   
         }
+        if (isset($post["timer"])) {
+            $this->_timer = $post["timer"];   
+        }
         if (isset($post["type"])) {
             $this->_type = $post["type"];   
         }
@@ -283,6 +287,7 @@ class Post
             "files"=>$this->_files,
             "category"=>$this->_category,
             "comments"=>$this->_comments,
+            "timer"=>$this->_timer,
             "type"=>$this->_type,
             "postType"=>$this->_postType,
             "likes"=>$this->_likes,
@@ -343,7 +348,7 @@ class Post
     /**
      * Like user post
      *   
-     * @param string $likedUserId  Id of post liked user  
+     * @param string          $likedUserId    Id of post liked user  
      * @param MongoCollection $postCollection Collections of posts 
      * @param MongoCollection $userCollection Collections of user
      * 
