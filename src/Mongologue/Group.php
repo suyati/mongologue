@@ -15,6 +15,8 @@ namespace Mongologue;
 /**
  * Class Managing Groups
  *
+ * @todo  implement child groups
+ *
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
@@ -27,7 +29,8 @@ class Group
     private $_id;
     private $_name;
     private $_type;
-    private $_parent=array();
+    private $_parent;
+    private $_children = array();
     private $_members = array();
     private $_followers = array();
 
@@ -42,10 +45,35 @@ class Group
     public static function fromID($groupId, \MongoCollection $collection)
     {
         $group = $collection->findOne(array("id"=> $groupId));
+        
         if($group)
             return new self($group);
         else
             throw new Exceptions\Group\GroupNotFoundException("No Such Group");
+    }
+
+    /**
+     * Find a Group from Name and Parent ID
+     * 
+     * @param string          $groupName  Name of Group
+     * @param MongoCollection $collection Group Collection
+     * @param string          $parentId   Id of the parent group
+     * 
+     * @return string Id of the Group
+     */
+    public static function fromName($groupName, \MongoCollection $collection, $parentId=null)
+    {
+        $query = array("name"=>$groupName, "parent"=>$parentId);
+
+        $group = $collection->findOne($query);
+
+        if ($group) {
+            $group = new self($group);
+            return $group->id();
+        } else {
+            throw new Exceptions\Group\GroupNotFoundException("No Such Group");
+        }
+
     }
 
      /**
@@ -151,6 +179,9 @@ class Group
         if (isset($group["followers"])) {
             $this->_followers = $group["followers"];
         }
+        if (isset($group["children"])) {
+            $this->_children = $group["children"];
+        }
     }
 
     /**
@@ -171,6 +202,16 @@ class Group
     function id()
     {
         return $this->_id;
+    }
+
+    /**
+     * Get the parent group ID
+     * 
+     * @return string Id of the Parent Group
+     */
+    public function parent()
+    {
+        return $this->_parent;
     }
 
     /**
@@ -289,7 +330,8 @@ class Group
             "type" => $this->_type,
             "parent" => $this->_parent,
             "members" => $this->_members,
-            "followers" => $this->_followers
+            "followers" => $this->_followers,
+            "children" => $this->_children
         );
 
         return $document;

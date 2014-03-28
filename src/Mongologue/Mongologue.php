@@ -359,6 +359,19 @@ class Mongologue
     }
 
     /**
+     * Get a Groups Id from its Name and Parent Group Id
+     * 
+     * @param string $groupName Name of the Group
+     * @param string $parentId  Id of the Parent Group
+     * 
+     * @return string Id of the Group
+     */
+    public function getGroupIdFromName($groupName, $parentId=null)
+    {
+        return Group::fromName($groupName, $this->_groupCollection, $parentId);
+    }
+
+    /**
      * Get the Feed for a User
      * 
      * @param string  $userId Id of the User

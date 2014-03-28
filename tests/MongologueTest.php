@@ -234,6 +234,69 @@ class MongologueTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Testing Sub Group Formation and Retrieval of Id from Name and Parent Id
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldbeAbletoRetrieveIdFromGroupNameAndParentID()
+    {
+        $dbName = self::DB_NAME;
+
+        $group_1 = array(
+            "id" => 21,
+            "name" => "Foo21"
+        );
+
+        $group_2 = array(
+            "id" => 22,
+            "name" => "Foo21"
+        );
+
+        $subgroup_1 = array(
+            "id" => 23,
+            "name" => "1",
+            "parent" => 21
+        );
+
+        $subgroup_2 = array(
+            "id" => 24,
+            "name" => "1",
+            "parent" => 22
+        );
+
+        $app = new \Mongologue\Mongologue(new \MongoClient(), $dbName);
+
+        $app->registerGroup(
+            new \Mongologue\Group($group_1)
+        );
+
+        $app->registerGroup(
+            new \Mongologue\Group($group_2)
+        );
+
+        $app->registerGroup(
+            new \Mongologue\Group($subgroup_1)
+        );
+
+        $app->registerGroup(
+            new \Mongologue\Group($subgroup_2)
+        );
+
+        $subgroup_one = $app->getGroup($subgroup_1["id"]);
+
+        $this->assertEquals($group_1["id"], $subgroup_one->parent());
+
+        $subgroup_two = $app->getGroup($subgroup_2["id"]);
+
+        $this->assertEquals($group_2["id"], $subgroup_two->parent());
+
+        $this->assertEquals($subgroup_1["id"], $app->getGroupIdFromName($subgroup_1["name"], $group_1["id"]));
+        $this->assertEquals($group_1["id"], $app->getGroupIdFromName($group_1["name"]));
+    }
+
+    /**
      * Should Be Able To Register Category
      *
      * @test
