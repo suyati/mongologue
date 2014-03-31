@@ -41,8 +41,10 @@ class Factory
 
         $users = new \Mongologue\Collection\User($db->createCollection("users"), $collections);
         $groups = new \Mongologue\Collection\Group($db->createCollection("groups"), $collections);
-        //$posts = new Colleciton\Post($db->createCollection("posts"), $collections);
-        //$inbox = new Colleciton\Inbox($db->createCollection("inbox"), $collections);
+        $posts = new Colleciton\Post($db->createCollection("posts"), $collections);
+        $inbox = new Colleciton\Inbox($db->createCollection("inbox"), $collections);
+
+        $posts->setGridFS($db->getGridFS());
 
         $collections->registerCollection("users", $users);
         $collections->registerCollection("groups", $groups);
