@@ -21,7 +21,7 @@ namespace Mongologue\Tests\Integration;
  * @version  0.1.1
  * @link     http://suyati.com
  */
-class MongologueSpecs extends \PHPUnit_Framework_TestCase
+class MongologueSpec extends \PHPUnit_Framework_TestCase
 {
     protected static $mongologue;
 
