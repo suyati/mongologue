@@ -11,6 +11,7 @@
 namespace Mongologue\Core;
 
 use \Mongologue\Interfaces\Collection;
+use \Mongologue\Exception;
 
 /**
  * Class Conatining a Group of Collections

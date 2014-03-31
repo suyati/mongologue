@@ -63,8 +63,8 @@ class Post implements Collection
      */
     private function _findRecipients(Models\Post $post, Models\User $user)
     {
-        $followers = $user->followers();
-        $groups = $user->groups();
+        $followers = $user->followers;
+        $groups = $user->groups;
 
         foreach ($groups as $groupId) {
             $group = $this->_collections->getCollectionFor("group")->modelFromId($groupId);
@@ -100,8 +100,8 @@ class Post implements Collection
      */
     public function saveFiles(Models\Post $post)
     {   
-        foreach ($post->_filesToBeAdded as $name => $attributes) {
-            $post->addFile($grid->storeFile($name, $attributes));
+        foreach ($post->filesToBeAdded() as $name => $attributes) {
+            $post->addFile($this->_grid->storeFile($name, $attributes));
         }
     }
 
@@ -126,7 +126,7 @@ class Post implements Collection
             }
             
             $this->saveFiles($post);
-            $this->_collection->insert($post);
+            $this->_collection->insert($post->document());
         }
 
         return $post->id;
@@ -138,20 +138,20 @@ class Post implements Collection
      * @param array $post Details Post to be Created
      *
      * @access public
-     * @return bool True if success
+     * @return string Id of the Post
      */
     public function create(Models\Post $post)
     {
-        $user = $this->_collections->getCollectionFor("user")->modelFromId($post->userId);
+        $user = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
         $post->setId(
-            $this->_collections->getCollectionFor("counters")->nextPostId()
+            $this->_collections->getCollectionFor("counters")->nextId("posts")
         );
         
         $this->_findRecipients($post, $user);
 
         $this->_collections->getCollectionFor("inbox")->writeToInbox($post);
         
-        $this->savePost($post);        
+        return $this->savePost($post);        
     }
 
     /**
@@ -163,11 +163,25 @@ class Post implements Collection
      */
     public function update(Models\Post $post)
     {
-
         $this->_collection->update(
             array("id" => $post->id()),
             $post->document()
         );
+    }
+
+    /**
+     * Find a Post
+     * 
+     * @param mixed $param Parameter to Find. Pass an Id or a query
+     * 
+     * @return array document for the post
+     */
+    public function find($param)
+    {
+        if(is_array($param))
+            return $this->modelFromQuery($param)->document();
+        else
+            return $this->modelFromId($param)->document();
     }
 
     /**
@@ -187,28 +201,6 @@ class Post implements Collection
             throw new Exceptions\Post\PostNotFoundException("Post with ID $id not found");
     }
 
-    /**
-     * Register a New Post
-     * 
-     * @param Models\Post $post Model of the Post to be Registered
-     *
-     * @throws DuplicatePostException when an existing post id is provided
-     * @return bool True if Success
-     */
-    public function register(Models\Post $post)
-    {
-        try
-        {
-            $temp = $this->modelFromId($post->id());
-        }
-        catch(Exceptions\Post\PostNotFoundException $e)
-        {
-            $this->_collection->insert($post->document());
-            return true;
-        }
-
-        throw new Exceptions\Post\DuplicatePostException("Post with this ID already registered");
-    }
 
     /**
      * Get All Posts

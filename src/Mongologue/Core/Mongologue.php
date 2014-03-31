@@ -38,12 +38,12 @@ class Mongologue
      * @param Collection\Post  $postCollection  [description]
      * @param Collection\Inbox $inboxCollection [description]
      */
-    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection)
+    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection)
     {
         $this->_userCollection = $userCollection;
         $this->_groupCollection = $groupCollection;
-        /*$this->_postCollection = $postCollection;
-        $this->_inboxCollection = $inboxCollection;*/
+        $this->_postCollection = $postCollection;
+        $this->_inboxCollection = $inboxCollection;
     }
 
     /**

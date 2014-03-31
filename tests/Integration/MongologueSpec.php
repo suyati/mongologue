@@ -138,6 +138,23 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Should Create and Retrieve Posts
+     * 
+     * @param array $postData Post Data
+     *
+     * @test
+     *
+     * @dataProvider providerValidPostData
+     * @return void
+     */
+    public function shouldCreatePostAndRetrieveById($postData)
+    {
+        $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
+
+        $this->assertEquals($postData["content"], self::$mongologue->post('find', $id)["content"]);
+    }
+
+    /**
      * Provide Valid Group Data
      * 
      * @return array List of Valid Group Data
@@ -196,6 +213,30 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "data" => array()
                 ),
                 array("name"=>"Botanist", "parent"=>1)
+            )
+        );
+    }
+
+    /**
+     * providerValidPostData 
+     * 
+     * @return array valid post Data
+     */
+    public function providerValidPostData()
+    {
+        return array(
+            array(
+                array(
+                    "userId"=>40,
+                    "datetime"=>"12.01.2014",
+                    "content"=>"hello testing",
+                    "filesToBeAdded" => array(
+                        __DIR__."/../resources/sherlock.jpg"=>array(
+                            "type"=>"jpeg",
+                            "size"=>"100"
+                        )
+                    )
+                )
             )
         );
     }

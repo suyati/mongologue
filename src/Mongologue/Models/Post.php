@@ -46,7 +46,7 @@ class Post extends Model
      */
     protected $data = array();
 
-    private $_necessaryAttributes = array("id", "content", "userId", "datetime");
+    private $_necessaryAttributes = array("content", "userId", "datetime");
 
     /**
      * Constructor of the Class
@@ -107,6 +107,16 @@ class Post extends Model
         if ($this->type=="comment")
             return true;
         return false;
+    }
+
+    /**
+     * Get the Files to be Added
+     * 
+     * @return array List of Files to be added
+     */
+    public function filesToBeAdded()
+    {
+        return $this->_filesToBeAdded;
     }
 
     /**

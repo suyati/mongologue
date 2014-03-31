@@ -42,22 +42,24 @@ class Factory
         $users = new Collection\User($db->createCollection("users"), $collections);
         $groups = new Collection\Group($db->createCollection("groups"), $collections);
         $posts = new Collection\Post($db->createCollection("posts"), $collections);
+        $inbox = new \Mongologue\Collection\Inbox($db->createCollection("inbox"), $collections);
         
-        //$inbox = new \Mongologue\Colleciton\Inbox($db->createCollection("inbox"), $collections);
-
-        //$posts->setGridFS($db->getGridFS());
+        $counters = new Collection\Counter($db->createCollection("counters"), $collections);
+        
+        $posts->setGridFS($db->getGridFS());
 
         $collections->registerCollection("users", $users);
         $collections->registerCollection("groups", $groups);
-        //$collections->registerCollection("posts", $posts);
-        //$collections->registerCollection("inbox", $inbox);
+        $collections->registerCollection("posts", $posts);
+        $collections->registerCollection("inbox", $inbox);
 
+        $collections->registerCollection("counters", $counters);
 
         return new \Mongologue\Core\Mongologue(
             $users,
-            $groups
-            /*$posts, 
-            $inbox*/
+            $groups,
+            $posts, 
+            $inbox
         );
     }
 }

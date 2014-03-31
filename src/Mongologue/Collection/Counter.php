@@ -55,13 +55,15 @@ class Counter implements Collection
 
     /**
      * Get the Next Counter Id
+     *
+     * @param string $id Id of the Collection
      * 
      * @return integer The Id for the Counter Id next in Sequence
      */
-    private function _getNextCounterId()
+    public function nextId($id)
     {
-        $count = $counters->findAndModify(
-            array("id"=>"counters"),
+        $count = $this->_collection->findAndModify(
+            array("id"=>$id),
             array('$inc'=>array("s"=>1)),
             null,
             array("upsert"=>true, "new"=>true)
