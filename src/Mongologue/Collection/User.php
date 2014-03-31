@@ -135,6 +135,21 @@ class User implements Collection
     }
 
     /**
+     * Find a User
+     * 
+     * @param mixed $param Parameter to Find. Pass an Id or a query
+     * 
+     * @return array document for the group
+     */
+    public function find($param)
+    {
+        if(is_array($param))
+            return $this->modelFromQuery($param)->document();
+        else
+            return $this->modelFromId($param)->document();
+    }
+
+    /**
      * Follow a User
      * 
      * @param string $followeeId Id of the Followee

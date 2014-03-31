@@ -115,6 +115,21 @@ class Group implements Collection
     }
 
     /**
+     * Find a Group
+     * 
+     * @param mixed $param Parameter to Find. Pass an Id or a query
+     * 
+     * @return array document for the group
+     */
+    public function find($param)
+    {
+        if(is_array($param))
+            return $this->modelFromQuery($param)->document();
+        else
+            return $this->modelFromId($param)->document();
+    }
+
+    /**
      * Follow a Group
      * 
      * @param string $groupId    Id of the Group to be followed

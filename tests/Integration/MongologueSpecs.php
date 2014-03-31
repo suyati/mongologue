@@ -133,8 +133,8 @@ class MongologueSpecs extends \PHPUnit_Framework_TestCase
     {
         self::$mongologue->group('register', new \Mongologue\Models\Group($groupData));
 
-        $this->assertEquals($expectedDocument, self::$mongologue->group('modelFromId', $groupData["id"])->document());
-        $this->assertEquals($expectedDocument, self::$mongologue->group('modelFromQuery', $query)->document());
+        $this->assertEquals($expectedDocument, self::$mongologue->group('find', $groupData["id"]));
+        $this->assertEquals($expectedDocument, self::$mongologue->group('find', $query));
     }
 
     /**
