@@ -12,6 +12,7 @@ namespace Mongologue\Models;
 
 use \Mongologue\Interfaces\Model;
 use \Mongologue\Exceptions\Post as Exceptions;
+use \Mongologue\Exception;
 
 /**
  * File containing the Post Model Class
@@ -32,13 +33,12 @@ class Post extends Model
     protected $likes = array();
     protected $comments = array();
     protected $type;
-    protected $postType;
     protected $datetime;
     protected $category;
     protected $timer;
     protected $recipients = array();
 
-    protected $filesToBeAdded = array();
+    private $_filesToBeAdded = array();
 
     /**
      * Additional Data container
@@ -56,7 +56,11 @@ class Post extends Model
     public function __construct($post)
     {
         parent::__construct($post);
+
+        if (isset($post["filesToBeAdded"]))
+            $this->_filesToBeAdded = $post["filesToBeAdded"];
     }
+
     /**
      * Set Recipients for the Post
      * 
@@ -66,7 +70,58 @@ class Post extends Model
      */
     public function setRecipients(array $recipients)
     {
-        $this->_recipients = $recipients;
+        $this->recipients = $recipients;
+    }
+
+    /**
+     * Add a File to the Post
+     * 
+     * @param mixed $file File to be Added
+     *
+     * @return void
+     */
+    public function addFile($file)
+    {
+        $this->files[] = $file;
+    }
+
+    /**
+     * Set ID of the Post
+     * 
+     * @param string $id Id of the Post
+     *
+     * @return void
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * Check if Post is a comment
+     * 
+     * @return boolean True if Post is comment
+     */
+    public function isComment()
+    {
+        if ($this->type=="comment")
+            return true;
+        return false;
+    }
+
+    /**
+     * Add a Comment to the Post
+     * 
+     * @param string $postId Id of the Comment post
+     *
+     * @return void
+     */
+    public function addComment($postId)
+    {
+        if(in_array($postId, $this->comments))
+            throw new Exception("Comment Already Exists");
+
+        $this->comments[] = $postId;            
     }
 
     /**

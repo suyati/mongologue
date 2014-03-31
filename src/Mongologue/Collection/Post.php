@@ -27,6 +27,7 @@ class Post implements Collection
 {
     private $_collection;
     private $_collections;
+    private $_grid;
 
     /**
      * Constructor function
@@ -40,6 +41,17 @@ class Post implements Collection
         $this->_collection = $mongoCollection;
     }
 
+    /**
+     * Set a Grid FS to store the Files
+     * 
+     * @param MongoGridFS $grid MongoGridFS Object
+     *
+     * @return void
+     */
+    public function setGridFS(\MongoGridFS $grid)
+    {
+        $this->_grid = $grid;
+    }
 
     /**
      * Find Recipients of Post
@@ -77,30 +89,19 @@ class Post implements Collection
     }
 
 
-    /**
-     * Check if Post is a comment
-     * 
-     * @return boolean True if Post is comment
-     */
-    public function isComment()
-    {
-        if ($this->_postType=="comment")
-            return true;
-        return false;
-    }
-
+    
 
     /**
-     * Save any unadded files to the grid
+     * Save FIles in a Post
      * 
-     * @param MongoGridFS $grid Grid FS Object
+     * @param Models\Post $post Post Model
      * 
-     * @return boolean True of Success
+     * @return void
      */
-    public function saveFiles(\MongoGridFS $grid)
+    public function saveFiles(Models\Post $post)
     {   
-        foreach ($this->_filesToBeAdded as $name => $attributes) {
-            $this->_files[] = $grid->storeFile($name, $attributes);
+        foreach ($post->_filesToBeAdded as $name => $attributes) {
+            $post->addFile($grid->storeFile($name, $attributes));
         }
     }
 
@@ -114,21 +115,21 @@ class Post implements Collection
      */
     public function savePost(Models\Post $post)
     {
-        $tempPost = $this->_collection->findOne(array("id"=> $post->id()));
+        $tempPost = $this->_collection->findOne(array("id"=> $post->id));
         if ($tempPost) {
             throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
         } else {
             if ($post->isComment()) {
-                $parent = $this->_collection->modelFromID($post->parent(), $collection);
-                $parent->addComment($post->id());
-                $parent->update($collection);
+                $parent = $this->modelFromID($post->parent());
+                $parent->addComment($post->id);
+                $this->update($parent);
             }
             
-            $post->saveFiles($grid);
+            $this->saveFiles($post);
             $this->_collection->insert($post);
         }
 
-        return $post->id();
+        return $post->id;
     }
 
     /**
@@ -141,13 +142,16 @@ class Post implements Collection
      */
     public function create(Models\Post $post)
     {
-        $user = $this->_collections->getCollectionFor("user")->modelFromId($post["userId"]);
-        $id = $this->_collections->getCollectionFor("counters")->_getNextPostId();
-        $post["id"] = (string)$id;
-        $this->_findRecipients($post, $user);
-        $this->_collections->getCollectionFor("inbox")->writeToInbox($post);
-        return $this->savePost($post);
+        $user = $this->_collections->getCollectionFor("user")->modelFromId($post->userId);
+        $post->setId(
+            $this->_collections->getCollectionFor("counters")->nextPostId()
+        );
         
+        $this->_findRecipients($post, $user);
+
+        $this->_collections->getCollectionFor("inbox")->writeToInbox($post);
+        
+        $this->savePost($post);        
     }
 
     /**
