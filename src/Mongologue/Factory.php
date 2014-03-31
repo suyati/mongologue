@@ -41,7 +41,7 @@ class Factory
 
         $users = new \Mongologue\Collection\User($db->createCollection("users"), $collections);
         $groups = new \Mongologue\Collection\Group($db->createCollection("groups"), $collections);
-        //$posts = new Colleciton\User($db->createCollection("posts"), $collections);
+        //$posts = new Colleciton\Post($db->createCollection("posts"), $collections);
         //$inbox = new Colleciton\Inbox($db->createCollection("inbox"), $collections);
 
         $collections->registerCollection("users", $users);

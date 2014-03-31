@@ -23,18 +23,34 @@ namespace Mongologue\Tests\Integration;
  */
 class MongologueSpecs extends \PHPUnit_Framework_TestCase
 {
+    protected static $mongologue;
+
     const DB_NAME = "testTDB";
 
     /**
-     * Constructor of Class. Drops ALL TEST DBS
+     * setUpBeforeClass
+     *
+     * @return void
      */
-    public function __construct()
+    public static function setUpBeforeClass()
     {
-        parent::__construct();
+        $factory = new \Mongologue\Factory();
+        self::$mongologue = $factory->createMongologue(new \MongoClient(), self::DB_NAME);  
+    }
+
+    /**
+     * tearDownAfterClass
+     * 
+     * @return void
+     */
+    public static function tearDownAfterClass()
+    {
         $client = new \MongoClient();
         $dbName = self::DB_NAME;
         $db = $client->$dbName;
-        $db->drop();   
+        $db->drop();
+
+        self::$mongologue = null;
     }
 
     /**
@@ -54,9 +70,6 @@ class MongologueSpecs extends \PHPUnit_Framework_TestCase
             "groups"
         );
 
-        $factory = new \Mongologue\Factory();
-        $app = $factory->createMongologue(new \MongoClient(), $dbName);
-
         $collections = $client->selectDB($dbName)->getCollectionNames();
         foreach ($collectionNames as $key => $collection) {
             $this->assertTrue(in_array($collection, $collections));
@@ -72,12 +85,6 @@ class MongologueSpecs extends \PHPUnit_Framework_TestCase
      */
     public function shouldRegisterUser()
     {
-        $client = new \MongoClient();
-        $dbName = self::DB_NAME;
-
-        $factory = new \Mongologue\Factory();
-        $app = $factory->createMongologue(new \MongoClient(), $dbName);
-        
         $userData = array(
             "id" => 40,
             "handle" => "tommy",
@@ -105,9 +112,92 @@ class MongologueSpecs extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $app->user('register', new \Mongologue\Models\User($userData));
+        self::$mongologue->user('register', new \Mongologue\Models\User($userData));
 
-        $this->assertEquals($expectedUsersList, $app->user('all'));
+        $this->assertEquals($expectedUsersList, self::$mongologue->user('all'));
+    }
+
+    /**
+     * should Register Group And Retrieve By Query And Id
+     * 
+     * @param array $groupData        GroupData
+     * @param array $expectedDocument Expected Document
+     * @param array $query            Query to find Group
+     *
+     * @test
+     * 
+     * @dataProvider providerForValidGroupData
+     * @return void
+     */
+    public function shouldRegisterGroupAndRetrieveByQueryAndId($groupData, $expectedDocument, $query)
+    {
+        self::$mongologue->group('register', new \Mongologue\Models\Group($groupData));
+
+        $this->assertEquals($expectedDocument, self::$mongologue->group('modelFromId', $groupData["id"])->document());
+        $this->assertEquals($expectedDocument, self::$mongologue->group('modelFromQuery', $query)->document());
+    }
+
+    /**
+     * Provide Valid Group Data
+     * 
+     * @return array List of Valid Group Data
+     */
+    public function providerForValidGroupData()
+    {
+        return array(
+            array(
+                array("id"=>1, "name" => "Scientists"),
+                array(
+                    "id"=>1, 
+                    "name" => "Scientists", 
+                    "members" => array(), 
+                    "followers" => array(),
+                    "parent" => null,
+                    "type" => null,
+                    "data" => array()
+                ),
+                array("name"=>"Scientists")
+            ),
+            array(
+                array("id"=>4, "name"=>"Botanist"),
+                array(
+                    "id"=>4, 
+                    "name" => "Botanist", 
+                    "members" => array(), 
+                    "followers" => array(),
+                    "parent" => null,
+                    "type" => null,
+                    "data" => array()
+                ),
+                array("name"=>"Botanist")
+            ),
+            array(
+                array("id" => 2, "name" => "Physicist", "parent"=>1),
+                array(
+                    "id"=>2, 
+                    "name" => "Physicist", 
+                    "members" => array(), 
+                    "followers" => array(),
+                    "parent" => 1,
+                    "type" => null,
+                    "data" => array()
+                ),
+                array("name"=>"Physicist", "parent"=>1)
+            ),
+            array(
+                array("id" => 3, "name"=> "Botanist", "parent"=>1),
+                array(
+                    "id"=>3, 
+                    "name" => "Botanist", 
+                    "members" => array(), 
+                    "followers" => array(),
+                    "parent" => 1,
+                    "type" => null,
+                    "data" => array()
+                ),
+                array("name"=>"Botanist", "parent"=>1)
+            )
+        );
     }
 
 }

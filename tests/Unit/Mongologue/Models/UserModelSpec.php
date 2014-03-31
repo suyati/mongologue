@@ -56,6 +56,7 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
     {
         $user = new User($userData);
         $this->assertEquals($expectedDocument, $user->document());
+        $this->assertEquals(array(), $user->followers);
     }
 
     /**

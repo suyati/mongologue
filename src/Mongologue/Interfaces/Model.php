@@ -60,6 +60,18 @@ class Model
     }
 
     /**
+     * Magic Function to get all Attributes
+     * 
+     * @param string $attribute identifier for attribute
+     * 
+     * @return mixed Value of attribute
+     */
+    public function __get($attribute)
+    {
+        return $this->$attribute;
+    }
+
+    /**
      * Get All Attributes of the Class
      * 
      * @return array list of Attributes

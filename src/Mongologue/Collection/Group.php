@@ -13,6 +13,7 @@ namespace Mongologue\Collection;
 use \Mongologue\Interfaces\Collection;
 use \Mongologue\Models;
 use \Mongologue\Core\Collections;
+use \Mongologue\Exceptions;
 
 /**
  * Class Managing Collection of Groups
@@ -85,7 +86,7 @@ class Group implements Collection
     {
         try
         {
-            $temp = $this->modelFromId($group->id());
+            $temp = $this->modelFromId($group->id);
         }
         catch(Exceptions\Group\GroupNotFoundException $e)
         {

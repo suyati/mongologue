@@ -15,6 +15,8 @@ use \Mongologue\Collection;
 /**
  * Mongolouge Core Class
  *
+ * @todo Implement Posts and Inbox
+ * 
  * @category Mongolouge
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
