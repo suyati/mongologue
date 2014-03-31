@@ -6,8 +6,8 @@
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @naveenbos <nmohanan@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Exceptions\Post;
 
@@ -18,8 +18,8 @@ namespace Mongologue\Exceptions\Post;
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @naveenbos <nmohanan@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class PostNotFoundException extends \Exception
 {

@@ -5,7 +5,7 @@
  * @category Mongolouge
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
+ * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Core;
@@ -20,7 +20,7 @@ use \Mongologue\Collection;
  * @category Mongolouge
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
+ * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
  */
 class Mongologue

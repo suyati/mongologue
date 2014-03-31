@@ -6,8 +6,8 @@
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @nmohanan <nmohanan@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Exceptions\User;
 
@@ -17,8 +17,8 @@ namespace Mongologue\Exceptions\User;
  * @category Mongologue
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class FollowerNotFoundException extends \Exception
 {

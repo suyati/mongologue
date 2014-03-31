@@ -5,9 +5,9 @@
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  NONE http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
  * @version  0.1.1
- * @link     http://suyati.com
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue;
 
@@ -17,9 +17,9 @@ namespace Mongologue;
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  NONE http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
  * @version  0.1.1
- * @link     http://suyati.com
+ * @link     http://github.com/suyati/mongologue
  */
 class Config
 {

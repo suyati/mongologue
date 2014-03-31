@@ -5,8 +5,8 @@
  * @category Mongologue
  * @package  Models
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Models;
 
@@ -20,8 +20,8 @@ use \Mongologue\Exception;
  * @category Mongologue
  * @package  Models
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class Post extends Model
 {

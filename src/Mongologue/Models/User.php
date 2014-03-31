@@ -5,8 +5,8 @@
  * @category Mongologue
  * @package  Models
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Models;
 
@@ -21,8 +21,8 @@ use \Mongologue\Exceptions\User as Exceptions;
  * @category Mongologue
  * @package  Models
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class User extends Model
 {

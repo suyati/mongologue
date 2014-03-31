@@ -5,8 +5,8 @@
  * @category Mongologue
  * @package  Mongologue
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue;
 
@@ -20,8 +20,8 @@ use \Mongologue\Core\Collections;
  * @category Mongologue
  * @package  Mongologue
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class Factory
 {

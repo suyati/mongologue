@@ -5,8 +5,8 @@
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Core;
 
@@ -19,8 +19,8 @@ use \Mongologue\Exception;
  * @category Mongologue
  * @package  Core
  * @author   @kpnunni <krishnanunni@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class Collections
 {

@@ -6,8 +6,8 @@
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @naveenbos <nmohanan@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Exceptions\Group;
 
@@ -18,8 +18,8 @@ namespace Mongologue\Exceptions\Group;
  * @package  Exceptions
  * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @naveenbos <nmohanan@suyati.com>
- * @license  NONE http://suyati.com
- * @link     http://suyati.com
+ * @license  NONE http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class UserNotFollowingThisGroupException extends \Exception
 {

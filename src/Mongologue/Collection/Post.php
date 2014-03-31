@@ -5,8 +5,8 @@
  * @category Mongologue
  * @package  Collection
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 namespace Mongologue\Collection;
 
@@ -20,8 +20,8 @@ use \Mongologue\Core\Collections;
  * @category Mongologue
  * @package  Collection
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
- * @license  none http://suyati.com
- * @link     http://github.com/xait/docxwriter
+ * @license  none http://github.com/suyati/mongologue
+ * @link     http://github.com/suyati/mongologue
  */
 class Post implements Collection
 {
