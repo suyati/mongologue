@@ -35,7 +35,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         $factory = new \Mongologue\Factory();
-        self::$mongologue = $factory->createMongologue(new \MongoClient(), self::DB_NAME);  
+        self::$mongologue = $factory->createMongologue(new \MongoClient(), self::DB_NAME);
     }
 
     /**
@@ -108,7 +108,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "followingGroups" => array(),
                     "likes" => array(),
                     "data" => array()
-                )   
+                )
             )
         );
 
@@ -163,9 +163,6 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
      */
     public function shouldLikePost()
     {
-        // $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
-
-
         self::$mongologue->post('like', "1", 40);
         $retrievedPost = self::$mongologue->post('find', "1");
         $this->assertEquals(array("40"), $retrievedPost["likes"]);
@@ -176,9 +173,27 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         self::$mongologue->post('like', "2", 40);
         $retrievedPost = self::$mongologue->post('find', "2");
         $this->assertEquals(array("40"), $retrievedPost["likes"]);
+    }
+    
+    /**
+     * Should get Post comments
+     * 
+     * @param array $commentData comment Data
+     * 
+     * @test
+     *
+     * @dataProvider providerValidCommentsData
+     * @return void
+     */
+    public function shouldReturnComments($commentData)
+    {
+        $id = self::$mongologue->post('create', new \Mongologue\Models\Post($commentData));
+        $retrievedPost = self::$mongologue->post('find', "1");
 
+        $comments = self::$mongologue->post('getComments', "1");
+        $this->assertEquals("hello comment testing", $comments[0]["content"]);
 
-
+        print_r($retrievedPost);
     }
 
     /**
@@ -209,9 +224,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             array(
                 array("id"=>1, "name" => "Scientists"),
                 array(
-                    "id"=>1, 
-                    "name" => "Scientists", 
-                    "members" => array(), 
+                    "id"=>1,
+                    "name" => "Scientists",
+                    "members" => array(),
                     "followers" => array(),
                     "parent" => null,
                     "type" => null,
@@ -222,9 +237,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             array(
                 array("id"=>4, "name"=>"Botanist"),
                 array(
-                    "id"=>4, 
-                    "name" => "Botanist", 
-                    "members" => array(), 
+                    "id"=>4,
+                    "name" => "Botanist",
+                    "members" => array(),
                     "followers" => array(),
                     "parent" => null,
                     "type" => null,
@@ -235,9 +250,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             array(
                 array("id" => 2, "name" => "Physicist", "parent"=>1),
                 array(
-                    "id"=>2, 
-                    "name" => "Physicist", 
-                    "members" => array(), 
+                    "id"=>2,
+                    "name" => "Physicist",
+                    "members" => array(),
                     "followers" => array(),
                     "parent" => 1,
                     "type" => null,
@@ -248,9 +263,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             array(
                 array("id" => 3, "name"=> "Botanist", "parent"=>1),
                 array(
-                    "id"=>3, 
-                    "name" => "Botanist", 
-                    "members" => array(), 
+                    "id"=>3,
+                    "name" => "Botanist",
+                    "members" => array(),
                     "followers" => array(),
                     "parent" => 1,
                     "type" => null,
@@ -273,7 +288,61 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                 array(
                     "userId"=>40,
                     "datetime"=>"12.01.2014",
-                    "content"=>"hello testing",
+                    "content"=>"hello testing1",
+                    "filesToBeAdded" => array(
+                        __DIR__."/../resources/sherlock.jpg"=>array(
+                            "type"=>"jpeg",
+                            "size"=>"100"
+                        )
+                    )
+                )
+            ),
+            array(
+                array(
+                    "userId"=>40,
+                    "datetime"=>"12.01.2014",
+                    "content"=>"hello testing2",
+                    "filesToBeAdded" => array(
+                        __DIR__."/../resources/sherlock.jpg"=>array(
+                            "type"=>"jpeg",
+                            "size"=>"100"
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    /**
+     * providerValidCommentsData 
+     * 
+     * @return array valid comments Data
+     */
+    public function providerValidCommentsData()
+    {
+        return array(
+            array(
+                array(
+                    "userId"=>40,
+                    "datetime"=>"12.01.2014",
+                    "content"=>"hello testing comment",
+                    "parent"=>"1",
+                    "type"=>"comment",
+                    "filesToBeAdded" => array(
+                        __DIR__."/../resources/sherlock.jpg"=>array(
+                            "type"=>"jpeg",
+                            "size"=>"100"
+                        )
+                    )
+                )
+            ),
+            array(
+                array(
+                    "userId"=>40,
+                    "datetime"=>"12.01.2014",
+                    "content"=>"hello testing comment",
+                    "parent"=>"1",
+                    "type"=>"comment",
                     "filesToBeAdded" => array(
                         __DIR__."/../resources/sherlock.jpg"=>array(
                             "type"=>"jpeg",
@@ -305,5 +374,4 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             )
         );
     }
-
 }

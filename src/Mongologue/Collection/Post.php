@@ -120,7 +120,7 @@ class Post implements Collection
             throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
         } else {
             if ($post->isComment()) {
-                $parent = $this->modelFromID($post->parent());
+                $parent = $this->modelFromID($post->parent);
                 $parent->addComment($post->id);
                 $this->update($parent);
             }
@@ -268,17 +268,16 @@ class Post implements Collection
      * getComment 
      * Get the Comment details
      * 
-     * @param MongoCollection $postCollection contain post collection
-     * 
+     * @param string $postId contain post id
+     *  
      * @return Array of Comments 
      */
-    public function getComments(\MongoCollection $postCollection)
+    public function getComments($postId)
     {
         $comments = array();
-        $commentCount = count($this->_comments);
-        foreach ($this->_comments as $commentId) {
-            $comment = Post::fromID($commentId, $postCollection);
-            $comments[] = $comment->document();
+        $post = $this->modelFromId($postId);
+        foreach ($post->comments as $commentId) {
+            $comments[] = $this->find($commentId);
         }
         return $comments;
     }
