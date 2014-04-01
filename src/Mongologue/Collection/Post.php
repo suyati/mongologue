@@ -4,6 +4,7 @@
  *
  * @category Mongologue
  * @package  Collection
+ * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
  * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
@@ -13,12 +14,14 @@ namespace Mongologue\Collection;
 use \Mongologue\Interfaces\Collection;
 use \Mongologue\Models;
 use \Mongologue\Core\Collections;
+use \Mongologue\Exceptions;
 
 /**
  * Class Managing Collection of Posts
  *
  * @category Mongologue
  * @package  Collection
+ * @author   @kpnunni <krishnanunni@suyati.com>
  * @author   @tkannippoyil <tkannippoyil@suyati.com>
  * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
@@ -252,7 +255,6 @@ class Post implements Collection
      */
     public function like($postId, $likedUserId)
     {
-        echo $postId;
         $post = $this->modelFromId($postId);
         if (in_array($likedUserId, $post->likes)) {    
             throw new Exceptions\Post\AlreadyLikesThisPostException("User with ID $likedUserId is already being liked this post");

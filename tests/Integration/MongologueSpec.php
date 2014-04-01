@@ -163,15 +163,15 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
      */
     public function shouldLikePost()
     {
-        self::$mongologue->post('like', "1", 40);
-        $retrievedPost = self::$mongologue->post('find', "1");
+        self::$mongologue->post('like', 1, 40);
+        $retrievedPost = self::$mongologue->post('find', 1);
         $this->assertEquals(array("40"), $retrievedPost["likes"]);
 
         $retrievedUser = self::$mongologue->user('find', 40);
-        $this->assertEquals(array("1"), $retrievedUser["likes"]);
+        $this->assertEquals(array(1), $retrievedUser["likes"]);
 
-        self::$mongologue->post('like', "2", 40);
-        $retrievedPost = self::$mongologue->post('find', "2");
+        self::$mongologue->post('like', 2, 40);
+        $retrievedPost = self::$mongologue->post('find', 2);
         $this->assertEquals(array("40"), $retrievedPost["likes"]);
     }
     
@@ -188,12 +188,10 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public function shouldReturnComments($commentData)
     {
         $id = self::$mongologue->post('create', new \Mongologue\Models\Post($commentData));
-        $retrievedPost = self::$mongologue->post('find', "1");
+        $retrievedPost = self::$mongologue->post('find', 1);
 
-        $comments = self::$mongologue->post('getComments', "1");
-        $this->assertEquals("hello comment testing", $comments[0]["content"]);
-
-        print_r($retrievedPost);
+        $comments = self::$mongologue->post('getComments', 1);
+        $this->assertEquals($commentData["content"], $comments[0]["content"]);
     }
 
     /**
@@ -326,7 +324,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "userId"=>40,
                     "datetime"=>"12.01.2014",
                     "content"=>"hello testing comment",
-                    "parent"=>"1",
+                    "parent"=>1,
                     "type"=>"comment",
                     "filesToBeAdded" => array(
                         __DIR__."/../resources/sherlock.jpg"=>array(
@@ -341,7 +339,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "userId"=>40,
                     "datetime"=>"12.01.2014",
                     "content"=>"hello testing comment",
-                    "parent"=>"1",
+                    "parent"=>1,
                     "type"=>"comment",
                     "filesToBeAdded" => array(
                         __DIR__."/../resources/sherlock.jpg"=>array(
