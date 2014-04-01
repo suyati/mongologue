@@ -163,8 +163,9 @@ class Post implements Collection
      */
     public function update(Models\Post $post)
     {
+            // print_r($post->id);exit();
         $this->_collection->update(
-            array("id" => $post->id()),
+            array("id" => $post->id),
             $post->document()
         );
     }
@@ -251,13 +252,14 @@ class Post implements Collection
      */
     public function like($postId, $likedUserId)
     {
-        $post = $this->find($postId);
+        echo $postId;
+        $post = $this->modelFromId($postId);
         if (in_array($likedUserId, $post->likes)) {    
             throw new Exceptions\Post\AlreadyLikesThisPostException("User with ID $likedUserId is already being liked this post");
         } else {
-            $this->_addLikedPostsToUser($likedUserId, $this->_id, $userCollection);
-            $this->_likes[] = $likedUserId;
-            $this->update($postCollection);
+            $this->_addLikedPostsToUser($likedUserId, $post->id);
+            $post->addLikes($likedUserId);
+            $this->update($post);
             return true;
         }
     }
@@ -292,11 +294,11 @@ class Post implements Collection
      *                               
      * @return User Instance of a User
      */
-    private static function _addLikedPostsToUser($likedUserId, $likedPostId)
+    private function _addLikedPostsToUser($likedUserId, $likedPostId)
     {
-        $user_collection = $this->collections->getCollectionFor("users");
-        $user = $user_collection->find($likedUserId);
-        if (in_array($likedPostId, $user->likedPosts)) {    
+        $user_collection = $this->_collections->getCollectionFor("users");
+        $user = $user_collection->modelFromId($likedUserId);
+        if (in_array($likedPostId, $user->likes)) {    
             throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
         } else {
                     

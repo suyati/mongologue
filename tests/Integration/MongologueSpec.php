@@ -155,6 +155,33 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Should like Posts
+     * 
+     * @test
+     *
+     * @return void
+     */
+    public function shouldLikePost()
+    {
+        // $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
+
+
+        self::$mongologue->post('like', "1", 40);
+        $retrievedPost = self::$mongologue->post('find', "1");
+        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+
+        $retrievedUser = self::$mongologue->user('find', 40);
+        $this->assertEquals(array("1"), $retrievedUser["likes"]);
+
+        self::$mongologue->post('like', "2", 40);
+        $retrievedPost = self::$mongologue->post('find', "2");
+        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+
+
+
+    }
+
+    /**
      * Provide Valid Group Data
      * 
      * @return array List of Valid Group Data

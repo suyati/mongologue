@@ -76,6 +76,33 @@ class User
     }
 
     /**
+     * Addliked Posts in to user collection
+     * 
+     * @param string          $likedUserId    Id of the User
+     * @param string          $likedPostId    Id of the Post
+     * @param MongoCollection $userCollection user collection 
+     *
+     * @throws UserNotFoundException if the user with the provided id does not exist
+     *                               in the colleciton.
+     *                               
+     * @return User Instance of a User
+     */
+    public static function addLikedPosts($likedUserId, $likedPostId, \MongoCollection $userCollection)
+    {
+        $user = User::fromID($likedUserId, $userCollection);
+        if (in_array($likedPostId, $user->_likedPosts)) {    
+            throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
+        } else {
+                    
+            $user->_likedPosts[] = $likedPostId;
+            $user->update($userCollection);
+            return true;
+        }
+    }
+
+
+
+    /**
      * Register a User to the System.
      * 
      * @param User            $user       User Object to be registered

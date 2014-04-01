@@ -98,6 +98,18 @@ class Post extends Model
     }
 
     /**
+     * Add likes to the Post
+     * 
+     * @param string $userId Liked user's id
+     *
+     * @return void
+     */
+    public function addLikes($userId)
+    {
+        $this->likes[] = $userId;
+    }
+
+    /**
      * Check if Post is a comment
      * 
      * @return boolean True if Post is comment
