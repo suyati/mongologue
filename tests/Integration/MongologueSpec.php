@@ -155,20 +155,30 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * should Create Category And Retrieve Id
+     * Should like Posts
      * 
-     * @param array $categoryData category data
-     *
      * @test
      *
-     * @dataProvider provideValidCategoryData
      * @return void
      */
-    public function shouldCreateCategoryAndRetrieveId($categoryData)
+    public function shouldLikePost()
     {
-        $id = self::$mongologue->category('create', new \Mongologue\Models\Category($categoryData));
-        $retrievedCategory = self::$mongologue->category('find', $id);
-        $this->assertEquals($categoryData["name"], $retrievedCategory["name"]);
+        // $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
+
+
+        self::$mongologue->post('like', "1", 40);
+        $retrievedPost = self::$mongologue->post('find', "1");
+        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+
+        $retrievedUser = self::$mongologue->user('find', 40);
+        $this->assertEquals(array("1"), $retrievedUser["likes"]);
+
+        self::$mongologue->post('like', "2", 40);
+        $retrievedPost = self::$mongologue->post('find', "2");
+        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+
+
+
     }
 
     /**
