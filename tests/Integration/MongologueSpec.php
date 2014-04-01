@@ -155,6 +155,23 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * should Create Category And Retrieve Id
+     * 
+     * @param array $categoryData category data
+     *
+     * @test
+     *
+     * @dataProvider provideValidCategoryData
+     * @return void
+     */
+    public function shouldCreateCategoryAndRetrieveId($categoryData)
+    {
+        $id = self::$mongologue->category('create', new \Mongologue\Models\Category($categoryData));
+        $retrievedCategory = self::$mongologue->category('find', $id);
+        $this->assertEquals($categoryData["name"], $retrievedCategory["name"]);
+    }
+
+    /**
      * Provide Valid Group Data
      * 
      * @return array List of Valid Group Data
@@ -236,6 +253,27 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                             "size"=>"100"
                         )
                     )
+                )
+            )
+        );
+    }
+
+    /**
+     * provideValidCategoryData
+     * 
+     * @return array valid category data
+     */
+    public function provideValidCategoryData()
+    {
+        return array(
+            array(
+                array(
+                    "name"=>"Hello"
+                )
+            ),
+            array(
+                array(
+                    "name"=>"Naveen"
                 )
             )
         );

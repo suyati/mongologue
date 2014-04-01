@@ -42,7 +42,8 @@ class Factory
         $users = new Collection\User($db->createCollection("users"), $collections);
         $groups = new Collection\Group($db->createCollection("groups"), $collections);
         $posts = new Collection\Post($db->createCollection("posts"), $collections);
-        $inbox = new \Mongologue\Collection\Inbox($db->createCollection("inbox"), $collections);
+        $inbox = new Collection\Inbox($db->createCollection("inbox"), $collections);
+        $category = new Collection\Category($db->createCollection("category"), $collections);
         
         $counters = new Collection\Counter($db->createCollection("counters"), $collections);
         
@@ -52,6 +53,7 @@ class Factory
         $collections->registerCollection("groups", $groups);
         $collections->registerCollection("posts", $posts);
         $collections->registerCollection("inbox", $inbox);
+        $collections->registerCollection("category", $category);
 
         $collections->registerCollection("counters", $counters);
 
@@ -59,7 +61,8 @@ class Factory
             $users,
             $groups,
             $posts, 
-            $inbox
+            $inbox,
+            $category
         );
     }
 }

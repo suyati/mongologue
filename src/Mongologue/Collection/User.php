@@ -53,7 +53,7 @@ class User implements Collection
     public function update(Models\User $user)
     {
         $this->_collection->update(
-            array("id" => $user->id()),
+            array("id" => $user->id),
             $user->document()
         );
     }
@@ -106,7 +106,7 @@ class User implements Collection
     {
         try
         {
-            $temp = $this->modelFromId($user->id());
+            $temp = $this->modelFromId($user->id);
         }
         catch(Exceptions\User\UserNotFoundException $e)
         {
@@ -177,7 +177,7 @@ class User implements Collection
      * 
      * @return void
      */
-    public function unFollow($followeeId, $followerId)
+    public function unfollow($followeeId, $followerId)
     {
         $followee = $this->modelFromId($followeeId);
         $follower = $this->modelFromId($followerId);

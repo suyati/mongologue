@@ -29,21 +29,24 @@ class Mongologue
     private $_groupCollection;
     private $_postCollection;
     private $_inboxCollection;
+    private $_categoryCollection;
 
     /**
      * Constructor of the Class
      * 
-     * @param Collection\User  $userCollection  [description]
-     * @param Collection\Group $groupCollection [description]
-     * @param Collection\Post  $postCollection  [description]
-     * @param Collection\Inbox $inboxCollection [description]
+     * @param Collection\User     $userCollection     [description]
+     * @param Collection\Group    $groupCollection    [description]
+     * @param Collection\Post     $postCollection     [description]
+     * @param Collection\Inbox    $inboxCollection    [description]
+     * @param Collection\Category $categoryCollection [description]
      */
-    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection)
+    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection, Collection\Category $categoryCollection)
     {
         $this->_userCollection = $userCollection;
         $this->_groupCollection = $groupCollection;
         $this->_postCollection = $postCollection;
         $this->_inboxCollection = $inboxCollection;
+        $this->_categoryCollection = $categoryCollection;
     }
 
     /**
@@ -96,5 +99,18 @@ class Mongologue
     {
         $params = array_slice(func_get_args(), 1);
         return $this->_inboxCollection->execute($callable, $params);
+    }
+
+    /**
+     * Allows Executing Functions on Category Collections
+     * 
+     * @param mixed $callable Executable Command for the Collection
+     * 
+     * @return mixed Result of Executed Command
+     */
+    public function category($callable)
+    {
+        $params = array_slice(func_get_args(), 1);
+        return $this->_categoryCollection->execute($callable, $params);
     }
 }
