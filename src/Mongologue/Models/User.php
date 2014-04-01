@@ -193,6 +193,18 @@ class User extends Model
     }
 
     /**
+     * Setting value to the liked posts
+     * 
+     * @param string $val id of the posts
+     * 
+     * @return void      
+     */
+    public function setlikes($val)
+    {
+        $this->likes[] = $val;
+    }
+
+    /**
      * Get the Necessary Attributes of the Model
      * 
      * @return array Necessary Attributes of the Model
