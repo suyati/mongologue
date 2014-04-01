@@ -33,7 +33,7 @@ class User implements Collection
      * Constructor function
      *
      * @param MongoColleciton $mongoCollection Mongo Collection Object
-     * @param Collections     $collections     Group of Collecitons
+     * @param Collections     $collections     User of Collecitons
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
@@ -88,7 +88,7 @@ class User implements Collection
         $user = $this->_collection->findOne($query);
 
         if($user)
-            return new Models\Group($user);
+            return new Models\User($user);
         else
             throw new Exceptions\User\UserNotFoundException("No User Matching Query");
             
@@ -139,7 +139,7 @@ class User implements Collection
      * 
      * @param mixed $param Parameter to Find. Pass an Id or a query
      * 
-     * @return array document for the group
+     * @return array document for the user
      */
     public function find($param)
     {

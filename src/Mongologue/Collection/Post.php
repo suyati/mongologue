@@ -240,6 +240,73 @@ class Post implements Collection
     }
 
     /**
+     * Like User Post
+     * 
+     * @param string $postId      Id of the User post
+     * 
+     * @param string $likedUserId Id of the post liked user.
+     *
+     * @access public
+     * @return bool True if Success
+     */
+    public function like($postId, $likedUserId)
+    {
+        $post = $this->find($postId);
+        if (in_array($likedUserId, $post->likes)) {    
+            throw new Exceptions\Post\AlreadyLikesThisPostException("User with ID $likedUserId is already being liked this post");
+        } else {
+            $this->_addLikedPostsToUser($likedUserId, $this->_id, $userCollection);
+            $this->_likes[] = $likedUserId;
+            $this->update($postCollection);
+            return true;
+        }
+    }
+
+    /**
+     * getComment 
+     * Get the Comment details
+     * 
+     * @param MongoCollection $postCollection contain post collection
+     * 
+     * @return Array of Comments 
+     */
+    public function getComments(\MongoCollection $postCollection)
+    {
+        $comments = array();
+        $commentCount = count($this->_comments);
+        foreach ($this->_comments as $commentId) {
+            $comment = Post::fromID($commentId, $postCollection);
+            $comments[] = $comment->document();
+        }
+        return $comments;
+    }
+
+    /**
+     * Addliked Posts in to user collection
+     * 
+     * @param string $likedUserId Id of the User
+     * @param string $likedPostId Id of the Post
+     *
+     * @throws UserNotFoundException if the user with the provided id does not exist
+     *                               in the colleciton.
+     *                               
+     * @return User Instance of a User
+     */
+    private static function _addLikedPostsToUser($likedUserId, $likedPostId)
+    {
+        $user_collection = $this->collections->getCollectionFor("users");
+        $user = $user_collection->find($likedUserId);
+        if (in_array($likedPostId, $user->likedPosts)) {    
+            throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
+        } else {
+                    
+            $user->setLikes($likedPostId);
+            $user_collection->update($user);
+            return true;
+        }
+    }
+
+    /**
      * Execute a Command and return the Results
      * 
      * @param string $callable A function of the instance
