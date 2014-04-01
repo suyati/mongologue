@@ -150,8 +150,8 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public function shouldCreatePostAndRetrieveById($postData)
     {
         $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
-
-        $this->assertEquals($postData["content"], self::$mongologue->post('find', $id)["content"]);
+        $retrievedPost = self::$mongologue->post('find', $id);
+        $this->assertEquals($postData["content"], $retrievedPost["content"]);
     }
 
     /**
