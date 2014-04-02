@@ -70,9 +70,9 @@ class Post implements Collection
         $groups = $user->groups;
 
         foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("group")->modelFromId($groupId);
-            $members = $group->getMembers();
-            $groupFollowers = $group->getFollowers();
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members = $group->members;
+            $groupFollowers = $group->followers;
 
             $members = array_merge(
                 array_intersect($members, $groupFollowers),
@@ -123,7 +123,7 @@ class Post implements Collection
             throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
         } else {
             if ($post->isComment()) {
-                $parent = $this->modelFromID($post->parent);
+                $parent = $this->modelFromID((integer)$post->parent);
                 $parent->addComment($post->id);
                 $this->update($parent);
             }
@@ -223,6 +223,23 @@ class Post implements Collection
         return $posts;
     }
 
+    /**
+     * Get All maching Posts
+     * 
+     * @return array List of All maching Posts
+     */
+    public function search($query)
+    {
+        $posts = array();
+        $cursor = $this->_collection->find($query);
+
+        foreach ($cursor as $document) {
+            $posts[] = new Models\Post($document);
+        }
+
+        return $posts;
+    }
+
 
     /**
      * Get a Post Model using a Query
@@ -277,9 +294,9 @@ class Post implements Collection
     public function getComments($postId)
     {
         $comments = array();
-        $post = $this->modelFromId($postId);
-        foreach ($post->comments as $commentId) {
-            $comments[] = $this->find($commentId);
+        $posts = $this->search(array("parent" => $postId));
+        foreach ($posts as $post) {
+            $comments[] = $post->document();
         }
         return $comments;
     }

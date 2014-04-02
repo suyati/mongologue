@@ -52,7 +52,7 @@ class Group implements Collection
     {
 
         $this->_collection->update(
-            array("id" => $group->id()),
+            array("id" => $group->id),
             $group->document()
         );
     }
@@ -107,7 +107,7 @@ class Group implements Collection
         $groups = array();
         $cursor = $this->_collection->find();
 
-        foreach ($$cursor as $document) {
+        foreach ($cursor as $document) {
             $groups[] = new Models\Group($document);
         }
 
@@ -140,13 +140,13 @@ class Group implements Collection
     public function follow($groupId, $followerId)
     {
         $group = $this->modelFromId($groupId);
-        $follower = $this->_collections->getCollectionFor("user")->modelFromId($followerId);
+        $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
         $follower->followGroup($groupId);
         $group->addFollower($followerId);
 
         $this->update($group);
-        $this->_collections->getCollectionFor("user")->update($follower);
+        $this->_collections->getCollectionFor("users")->update($follower);
     }
 
     /**
@@ -160,13 +160,13 @@ class Group implements Collection
     public function unfollow($groupId, $followerId)
     {
         $group = $this->modelFromId($groupId);
-        $follower = $this->_collections->getCollectionFor("user")->modelFromId($followerId);
+        $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
         $follower->unfollowGroup($groupId);
         $group->removeFollower($followerId);
 
         $this->update($group);
-        $this->_collections->getCollectionFor("user")->update($follower);
+        $this->_collections->getCollectionFor("users")->update($follower);
     }
 
     /**
@@ -180,13 +180,13 @@ class Group implements Collection
     public function join($groupId, $joineeId)
     {
         $group = $this->modelFromId($groupId);
-        $joinee = $this->_collections->getCollectionFor("user")->modelFromId($joineeId);
+        $joinee = $this->_collections->getCollectionFor("users")->modelFromId($joineeId);
 
         $joinee->joinGroup($groupId);
         $group->addMember($joineeId);
 
         $this->update($group);
-        $this->_collections->getCollectionFor("user")->update($joinee);
+        $this->_collections->getCollectionFor("users")->update($joinee);
     }
 
     /**
@@ -200,13 +200,13 @@ class Group implements Collection
     public function leave($groupId, $memberId)
     {
         $group = $this->modelFromId($groupId);
-        $member = $this->_collections->getCollectionFor("user")->modelFromId($memberId);
+        $member = $this->_collections->getCollectionFor("users")->modelFromId($memberId);
 
         $joinee->leaveGroup($groupId);
         $group->removeMember($memberId);
 
         $this->update($group);
-        $this->_collections->getCollectionFor("user")->update($member);
+        $this->_collections->getCollectionFor("users")->update($member);
     }
 
     /**

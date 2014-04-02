@@ -152,7 +152,7 @@ class User extends Model
      */
     public function removeFollower($followerId)
     {
-        if(in_array($followerId, $this->followers))
+        if(!in_array($followerId, $this->followers))
             throw new Exceptions\FollowerNotFoundException("No Such Follower");
 
         $this->followers = array_diff($this->followers, array($followerId));        

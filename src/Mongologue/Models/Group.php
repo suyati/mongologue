@@ -66,6 +66,39 @@ class Group extends Model
     }
 
     /**
+     * Add a Follower to the group
+     * 
+     * @param string $userId Id of the user
+     *
+     * @todo implement Exception
+     * @return void
+     */
+    public function addFollower($userId)
+    {
+        if(in_array($userId, $this->members))
+            throw new Exception("User with ID $userId Already a Follower of the Group");
+
+        $this->followers[] = $userId;            
+    }
+
+    /**
+     * 
+     * remove a Follower from the group
+     * 
+     * @param string $userId Id of the user
+     *
+     * @todo implement Exception
+     * @return void
+     */
+    public function removeFollower($userId)
+    {
+        if(in_array($userId, $this->members))
+            throw new Exception("User with ID $userId Already a Follower of the Group");
+
+        $this->followers = array_diff($this->followers, array($userId));
+    }
+
+    /**
      * Remove a Member from Group
      * 
      * @param string $userId ID of the Member User

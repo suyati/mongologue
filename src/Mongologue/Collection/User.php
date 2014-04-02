@@ -163,7 +163,7 @@ class User implements Collection
         $follower = $this->modelFromId($followerId);
 
         $follower->follow($followeeId);
-        $follower->addFollower($followerId);
+        $followee->addFollower($followerId);
 
         $this->update($follower);
         $this->update($followee);
@@ -183,7 +183,7 @@ class User implements Collection
         $follower = $this->modelFromId($followerId);
 
         $follower->unfollow($followeeId);
-        $follower->removeFollower($followerId);
+        $followee->removeFollower($followerId);
 
         $this->update($follower);
         $this->update($followee);
