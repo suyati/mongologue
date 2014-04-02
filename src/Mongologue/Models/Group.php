@@ -75,8 +75,8 @@ class Group extends Model
      */
     public function addFollower($userId)
     {
-        if(in_array($userId, $this->members))
-            throw new Exception("User with ID $userId Already a Follower of the Group");
+        if(in_array($userId, $this->followers))
+            throw new \Exception("User with ID $userId Already a Follower of the Group");
 
         $this->followers[] = $userId;            
     }
@@ -92,8 +92,8 @@ class Group extends Model
      */
     public function removeFollower($userId)
     {
-        if(in_array($userId, $this->members))
-            throw new Exception("User with ID $userId Already a Follower of the Group");
+        if(!in_array($userId, $this->followers))
+            throw new \Exception("User with ID $userId Already a Follower of the Group");
 
         $this->followers = array_diff($this->followers, array($userId));
     }

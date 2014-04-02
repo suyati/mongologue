@@ -155,11 +155,19 @@ class Group implements Collection
         $group = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
-        $follower->followGroup($groupId);
-        $group->addFollower($followerId);
+        if(is_null($group->parent))
+        {
+            $follower->followGroup($groupId);
+            $this->_collections->getCollectionFor("users")->update($follower);
 
-        $this->update($group);
-        $this->_collections->getCollectionFor("users")->update($follower);
+        }
+        else
+        {
+        // print_r($group->parent);exit();
+
+            $group->addFollower($followerId);
+            $this->update($group);
+        }
     }
 
     /**
@@ -174,12 +182,16 @@ class Group implements Collection
     {
         $group = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
-
-        $follower->unfollowGroup($groupId);
-        $group->removeFollower($followerId);
-
-        $this->update($group);
-        $this->_collections->getCollectionFor("users")->update($follower);
+        if(!is_null($group->parent))
+        {
+            $group->removeFollower($followerId);
+            $this->update($group);
+        }
+        else
+        {
+            $follower->unfollowGroup($groupId);
+            $this->_collections->getCollectionFor("users")->update($follower);
+        }
     }
 
     /**
@@ -200,6 +212,26 @@ class Group implements Collection
 
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($joinee);
+    }
+
+
+    /**
+     * Get the subgroups
+     * 
+     * @param string $groupId  Id of the parent Group
+     * 
+     * @return void
+     */
+    public function subGroups($groupId)
+    {
+        $groups = array();
+        $cursor = $this->_collection->find(array("parent" => $groupId));
+
+        foreach ($cursor as $document) {
+            $groups[] = new Models\Group($document);
+        }
+
+        return $groups;
     }
 
     /**

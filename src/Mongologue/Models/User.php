@@ -108,9 +108,10 @@ class User extends Model
     public function followGroup($groupId)
     {
         if(in_array($groupId, $this->followingGroups))
-            throw new Exceptions\AlreadyFollowingException("This Group is already Being Followed");
+            throw new Exceptions\AlreadyFollowingException("This Group $groupId is already Being Followed");
 
-        $this->followingGroups[] = $groupId;            
+        $this->followingGroups[] = $groupId;     
+
     }
 
     /**
