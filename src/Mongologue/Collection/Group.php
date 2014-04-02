@@ -84,17 +84,30 @@ class Group implements Collection
      */
     public function register(Models\Group $group)
     {
+        $group->setId(
+            $this->_collections->getCollectionFor("counters")->nextId("group")
+        );
+        $this->_collection->insert($group->document());
+        return $group->id;
+    }
+
+    /**
+     * Remove a Group
+     * 
+     * @param string $groupId id of the Group
+     *
+     * @return void
+     */
+    public function remove($groupId)
+    {
         try
         {
-            $temp = $this->modelFromId($group->id);
+            $this->_collection->remove(array("id"=>$groupId));
         }
         catch(Exceptions\Group\GroupNotFoundException $e)
         {
-            $this->_collection->insert($group->document());
-            return true;
-        }
-
-        throw new Exceptions\Group\DuplicateGroupException("Group with this ID already registered");
+            throw new Exception("Group with this ID not found");
+        } 
     }
 
     /**

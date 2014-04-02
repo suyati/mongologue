@@ -37,7 +37,7 @@ class Group extends Model
      */
     protected $data = array();
 
-    private $_necessaryAttributes = array("id", "name");
+    private $_necessaryAttributes = array("name");
 
     /**
      * Constructor of the Class
@@ -115,6 +115,17 @@ class Group extends Model
         $this->members = array_diff($this->members, array($userId));           
     }
 
+    /**
+     * Set an Id to the Group
+     * 
+     * @param string $id Id to be set
+     *
+     * @return void
+     */
+    public function setId($id)
+    {
+        $this->id = (string)$id;
+    }
 
     /**
      * Get the Necessary Attributes for the Model
