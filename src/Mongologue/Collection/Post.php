@@ -302,6 +302,19 @@ class Post implements Collection
     }
 
     /**
+     * getImage 
+     * Get the Image of the post
+     * 
+     * @param string $fileId contain post id
+     *  
+     * @return Array of Image 
+     */
+    public function getImage(\MongoId $fileId)
+    {
+        return $this->_grid->findOne(array('_id' =>$fileId));
+    }
+
+    /**
      * Addliked Posts in to user collection
      * 
      * @param string $likedUserId Id of the User
