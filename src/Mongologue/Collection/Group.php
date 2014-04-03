@@ -207,11 +207,11 @@ class Group implements Collection
         $group = $this->modelFromId($groupId);
         $joinee = $this->_collections->getCollectionFor("users")->modelFromId($joineeId);
 
-        $joinee->joinGroup($groupId);
+        // $joinee->joinGroup($groupId);
         $group->addMember($joineeId);
 
         $this->update($group);
-        $this->_collections->getCollectionFor("users")->update($joinee);
+        // $this->_collections->getCollectionFor("users")->update($joinee);
     }
 
 
