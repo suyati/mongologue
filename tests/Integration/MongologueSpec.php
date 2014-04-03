@@ -131,9 +131,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
      */
     public function shouldRegisterGroupAndRetrieveByQueryAndId($groupData, $expectedDocument, $query)
     {
-        self::$mongologue->group('register', new \Mongologue\Models\Group($groupData));
+        $id = self::$mongologue->group('register', new \Mongologue\Models\Group($groupData));
 
-        $this->assertEquals($expectedDocument, self::$mongologue->group('find', $groupData["id"]));
+        $this->assertEquals($expectedDocument, self::$mongologue->group('find', $id));
         $this->assertEquals($expectedDocument, self::$mongologue->group('find', $query));
     }
 
@@ -220,9 +220,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                array("id"=>1, "name" => "Scientists"),
+                array("name" => "Scientists"),
                 array(
-                    "id"=>1,
+                    "id"=>'1',
                     "name" => "Scientists",
                     "members" => array(),
                     "followers" => array(),
@@ -233,9 +233,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                 array("name"=>"Scientists")
             ),
             array(
-                array("id"=>4, "name"=>"Botanist"),
+                array("name"=>"Botanist"),
                 array(
-                    "id"=>4,
+                    "id"=>'2',
                     "name" => "Botanist",
                     "members" => array(),
                     "followers" => array(),
@@ -246,9 +246,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                 array("name"=>"Botanist")
             ),
             array(
-                array("id" => 2, "name" => "Physicist", "parent"=>1),
+                array("name" => "Physicist", "parent"=>1),
                 array(
-                    "id"=>2,
+                    "id"=>'3',
                     "name" => "Physicist",
                     "members" => array(),
                     "followers" => array(),
@@ -259,9 +259,9 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                 array("name"=>"Physicist", "parent"=>1)
             ),
             array(
-                array("id" => 3, "name"=> "Botanist", "parent"=>1),
+                array("name"=> "Botanist", "parent"=>1),
                 array(
-                    "id"=>3,
+                    "id"=>'4',
                     "name" => "Botanist",
                     "members" => array(),
                     "followers" => array(),
