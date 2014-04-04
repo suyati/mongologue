@@ -35,7 +35,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         $factory = new \Mongologue\Factory();
-        self::$mongologue = $factory->createMongologue(new \MongoClient(), self::DB_NAME);
+        self::$mongologue = $factory->createMongologue(new \MongoClient("mongodb://127.0.0.1"), self::DB_NAME);
     }
 
     /**
