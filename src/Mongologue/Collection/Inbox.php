@@ -69,39 +69,12 @@ class Inbox implements Collection
      * 
      * @return array List of Posts in Feed
      */
-    public function get($userId, $limit = null, $since = null)
+    public function feed($userId, $limit = null, $since = null)
     {
         $query = array("recipient" => $userId);
         $cursor = $this->_collection->find(array("recipient"=>$userId));
         if ($since) {
             $query["id"] = array('$gt' => $since);
-        }
-
-        $cursor = $cursor->sort(array("id"=>-1));
-
-        if ($limit) {
-            $cursor->limit((int)$limit);
-        }
-
-        return iterator_to_array($cursor);
-    }
-
-
-    /**
-     * GetMesages
-     * 
-     * @param string  $userId Id of User
-     * @param integer $limit  Limit for the results
-     * @param integer $since  Since which id
-     * 
-     * @return Arrray     List of Posts
-     */
-    public static function getFeeds($userId, $limit = null, $since = null)
-    {
-        if ($since) {
-            $cursor = $this->_collection->find(array("recipient"=>$userId, "id"=>array('$gt'=>$since)));
-        } else {
-            $cursor = $this->_collection->find(array("recipient"=>$userId));
         }
 
         $cursor = $cursor->sort(array("id"=>-1));
