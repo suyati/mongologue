@@ -59,10 +59,11 @@ class Group extends Model
      */
     public function addMember($userId)
     {
-        if(in_array($userId, $this->members))
+        if (in_array($userId, $this->members)) {
             throw new Exception("User with ID $userId Already a Member of the Group");
+        }
 
-        $this->members[] = $userId;            
+        $this->members[] = $userId;
     }
 
     /**
@@ -75,10 +76,11 @@ class Group extends Model
      */
     public function addFollower($userId)
     {
-        if(in_array($userId, $this->followers))
+        if (in_array($userId, $this->followers)) {
             throw new \Exception("User with ID $userId Already a Follower of the Group");
+        }
 
-        $this->followers[] = $userId;            
+        $this->followers[] = $userId;
     }
 
     /**
@@ -92,8 +94,9 @@ class Group extends Model
      */
     public function removeFollower($userId)
     {
-        if(!in_array($userId, $this->followers))
+        if (!in_array($userId, $this->followers)) {
             throw new \Exception("User with ID $userId Already a Follower of the Group");
+        }
 
         $this->followers = array_diff($this->followers, array($userId));
     }
@@ -109,10 +112,11 @@ class Group extends Model
      */
     public function removeMember($userId)
     {
-        if(!in_array($userId, $this->members))
+        if (!in_array($userId, $this->members)) {
             throw new Exceptions\MemberNotFoundException("User $userId is not a member of the Group");
+        }
 
-        $this->members = array_diff($this->members, array($userId));           
+        $this->members = array_diff($this->members, array($userId));
     }
 
     /**
@@ -124,7 +128,7 @@ class Group extends Model
      */
     public function setId($id)
     {
-        $this->id = (string)$id;
+        $this->id = $id;
     }
 
     /**
