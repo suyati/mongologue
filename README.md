@@ -1,1 +1,1 @@
-[![Build Status](https://travis-ci.org/suyati/mongologue.svg?token=zeq4PQv6LTxRxo3dwyhm)](https://travis-ci.org/suyati/mongologue)
+[![Build Status](https://api.travis-ci.org/suyati/mongologue.svg)](https://travis-ci.org/suyati/mongologue)
