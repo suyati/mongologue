@@ -72,15 +72,17 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
                     "id" => 21,
                     "handle" => "feynman",
                     "firstName" => "Richard",
-                    "lastName" => "FeynMan"
+                    "lastName" => "FeynMan",
+                    "email" => "r@x.com",
+                    "pic" => "htpp://kl.com/pic.jpeg"
                 ),
                 array(
                     "id" => 21,
                     "handle" => "feynman",
                     "firstName" => "Richard",
                     "lastName" => "FeynMan",
-                    "email" => null,
-                    "pic" => null,
+                    "email" => "r@x.com",
+                    "pic" => "htpp://kl.com/pic.jpeg",
                     "following" => array(),
                     "followers" => array(),
                     "groups" => array(),
@@ -99,6 +101,7 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
                     "following" => array(21),
                     "pic" => "someurl.com",
                     "email" => "a@b.com",
+                    "groups" => array(33),
                     "data" => array("userPages"=>array("A", "B"))
                 ),
                 array(
@@ -110,7 +113,7 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
                     "pic" => "someurl.com",
                     "following" => array(21),
                     "followers" => array(),
-                    "groups" => array(),
+                    "groups" => array(33),
                     "blocking" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
