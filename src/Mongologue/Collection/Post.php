@@ -87,7 +87,7 @@ class Post implements Collection
             );
         }
 
-        $post->setRecipients(array_diff($followers, array($user->id())));
+        $post->setRecipients(array_diff($followers, array($user->id)));
         return true;
     }
 
