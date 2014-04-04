@@ -46,7 +46,7 @@ class User extends Model
      */
     protected $data = array();
 
-    private $_necessaryAttributes = array("id", "handle", "firstName", "lastName");
+    private $_necessaryAttributes = array("id", "handle", "firstName", "lastName", "email");
 
     /**
      * Constructor of Class
@@ -59,16 +59,6 @@ class User extends Model
     }
 
     /**
-     * Return the Id of the Model
-     * 
-     * @return [type] [description]
-     */
-    public function id()
-    {
-        return $this->id;
-    }
-
-    /**
      * Follow a User
      * 
      * @param string $followeeId Id of User to Follow
@@ -77,10 +67,11 @@ class User extends Model
      */
     public function follow($followeeId)
     {
-        if(in_array($followeeId, $this->following))
+        if (in_array($followeeId, $this->following)) {
             throw new Exceptions\AlreadyFollowingException("This User is already Being Followed");
+        }
 
-        $this->following[] = $followeeId;            
+        $this->following[] = $followeeId;
     }
 
     /**
@@ -92,10 +83,11 @@ class User extends Model
      */
     public function unfollow($followeeId)
     {
-        if(!in_array($followeeId, $this->following))
+        if (!in_array($followeeId, $this->following)) {
             throw new Exceptions\NotFollowingException("No Such User is being Followed");
+        }
 
-        $this->following = array_diff($this->following, array($followeeId));           
+        $this->following = array_diff($this->following, array($followeeId));
     }
 
     /**
@@ -107,10 +99,11 @@ class User extends Model
      */
     public function followGroup($groupId)
     {
-        if(in_array($groupId, $this->followingGroups))
+        if (in_array($groupId, $this->followingGroups)) {
             throw new Exceptions\AlreadyFollowingException("This Group $groupId is already Being Followed");
+        }
 
-        $this->followingGroups[] = $groupId;     
+        $this->followingGroups[] = $groupId;
 
     }
 
@@ -123,10 +116,11 @@ class User extends Model
      */
     public function unfollowGroup($groupId)
     {
-        if(!in_array($groupId, $this->followingGroups))
+        if (!in_array($groupId, $this->followingGroups)) {
             throw new Exceptions\NotFollowingException("No Such User is being Followed");
+        }
 
-        $this->followingGroups = array_diff($this->followingGroups, array($groupId));           
+        $this->followingGroups = array_diff($this->followingGroups, array($groupId));
     }
 
     /**
@@ -138,8 +132,9 @@ class User extends Model
      */
     public function addFollower($followerId)
     {
-        if(in_array($followerId, $this->followers))
+        if (in_array($followerId, $this->followers)) {
             throw new Exceptions\AlreadyFollowingException("This User is already Following");
+        }
 
         $this->followers[] = $followerId;
     }
@@ -153,10 +148,11 @@ class User extends Model
      */
     public function removeFollower($followerId)
     {
-        if(!in_array($followerId, $this->followers))
+        if (!in_array($followerId, $this->followers)) {
             throw new Exceptions\FollowerNotFoundException("No Such Follower");
+        }
 
-        $this->followers = array_diff($this->followers, array($followerId));        
+        $this->followers = array_diff($this->followers, array($followerId));
     }
 
     /**
@@ -170,10 +166,11 @@ class User extends Model
      */
     public function joinGroup($groupId)
     {
-        if(in_array($groupId, $this->groups))
+        if (in_array($groupId, $this->groups)) {
             throw new Exception("Already a Member");
+        }
 
-        $this->groups[] = $groupId;            
+        $this->groups[] = $groupId;
     }
 
     /**
@@ -187,8 +184,9 @@ class User extends Model
      */
     public function leaveGroup($groupId)
     {
-        if(!in_array($groupId, $this->groups))
+        if (!in_array($groupId, $this->groups)) {
             throw new Exception('Not a Member of Group');
+        }
 
         $this->groups = array_diff($this->groups, array($groupId));
     }
