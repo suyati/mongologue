@@ -37,7 +37,7 @@ class Group implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
+        $this->_collections = $collections;
         $this->_collection = $mongoCollection;
     }
 
@@ -68,10 +68,11 @@ class Group implements Collection
     public function modelFromId($id)
     {
         $group = $this->_collection->findOne(array("id" => $id));
-        if($group)
+        if ($group) {
             return new Models\Group($group);
-        else
+        } else {
             throw new Exceptions\Group\GroupNotFoundException("Group with ID $id not found");
+        }
     }
 
     /**
@@ -100,14 +101,11 @@ class Group implements Collection
      */
     public function remove($groupId)
     {
-        try
-        {
+        try {
             $this->_collection->remove(array("id"=>$groupId));
-        }
-        catch(Exceptions\Group\GroupNotFoundException $e)
-        {
+        } catch (Exceptions\Group\GroupNotFoundException $e) {
             throw new Exception("Group with this ID not found");
-        } 
+        }
     }
 
     /**
@@ -136,10 +134,11 @@ class Group implements Collection
      */
     public function find($param)
     {
-        if(is_array($param))
+        if (is_array($param)) {
             return $this->modelFromQuery($param)->document();
-        else
+        } else {
             return $this->modelFromId($param)->document();
+        }
     }
 
     /**
@@ -195,11 +194,11 @@ class Group implements Collection
         $group = $this->modelFromId($groupId);
         $joinee = $this->_collections->getCollectionFor("users")->modelFromId($joineeId);
 
-        // $joinee->joinGroup($groupId);
+        $joinee->joinGroup($groupId);
         $group->addMember($joineeId);
 
         $this->update($group);
-        // $this->_collections->getCollectionFor("users")->update($joinee);
+        $this->_collections->getCollectionFor("users")->update($joinee);
     }
 
 
@@ -254,10 +253,11 @@ class Group implements Collection
     {
         $group = $this->_collection->findOne($query);
 
-        if($group)
+        if ($group) {
             return new Models\Group($group);
-        else
+        } else {
             throw new Exceptions\Group\GroupNotFoundException("No Group Matching Query");
+        }
             
     }
 
