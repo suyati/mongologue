@@ -37,7 +37,7 @@ class Category implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
+        $this->_collections = $collections;
         $this->_collection = $mongoCollection;
     }
 
@@ -86,10 +86,11 @@ class Category implements Collection
     public function modelFromId($id)
     {
         $category = $this->_collection->findOne(array("id"=> $id));
-        if($category)
+        if ($category) {
             return new Models\Category($category);
-        else
+        } else {
             throw new Exceptions\Category\CategoryNotFoundException("Category with ID $id Not Found");
+        }
     }
 
     /**
@@ -104,10 +105,11 @@ class Category implements Collection
     {
         $category = $this->_collection->findOne($query);
 
-        if($category)
+        if ($category) {
             return new Models\Group($category);
-        else
+        } else {
             throw new Exceptions\Category\CategoryNotFoundException("No Category Matching Query");
+        }
             
     }
 
@@ -120,10 +122,11 @@ class Category implements Collection
      */
     public function find($param)
     {
-        if(is_array($param))
+        if (is_array($param)) {
             return $this->modelFromQuery($param)->document();
-        else
+        } else {
             return $this->modelFromId($param)->document();
+        }
     }
 
     /**
@@ -135,12 +138,9 @@ class Category implements Collection
      */
     public function create(Models\Category $category)
     {
-        try
-        {
+        try {
             $temp = $this->modelFromId($category->id);
-        }
-        catch(Exceptions\Category\CategoryNotFoundException $e)
-        {
+        } catch (Exceptions\Category\CategoryNotFoundException $e) {
             $category->setId(
                 $this->_collections->getCollectionFor("counters")->nextId("category")
             );
@@ -161,14 +161,11 @@ class Category implements Collection
      */
     public function remove(Models\Category $category)
     {
-        try
-        {
+        try {
             $this->_collection->remove(array("id"=>$category->id));
-        }
-        catch(Exceptions\Category\CategoryNotFoundException $e)
-        {
+        } catch (Exceptions\Category\CategoryNotFoundException $e) {
             throw new Exception("Category with this ID not found");
-        } 
+        }
     }
 
     /**

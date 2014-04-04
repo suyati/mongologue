@@ -36,7 +36,7 @@ class Inbox implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
+        $this->_collections = $collections;
         $this->_collection = $mongoCollection;
     }
 
@@ -69,16 +69,19 @@ class Inbox implements Collection
      * 
      * @return array List of Posts in Feed
      */
-    public function get($userId, $limit=null, $since=null)
+    public function get($userId, $limit = null, $since = null)
     {
         $query = array("recipient" => $userId);
-        if($since) 
+        $cursor = $this->_collection->find(array("recipient"=>$userId));
+        if ($since) {
             $query["id"] = array('$gt' => $since);
+        }
 
         $cursor = $cursor->sort(array("id"=>-1));
 
-        if($limit)
+        if ($limit) {
             $cursor->limit((int)$limit);
+        }
 
         return iterator_to_array($cursor);
     }
@@ -93,7 +96,7 @@ class Inbox implements Collection
      * 
      * @return Arrray     List of Posts
      */
-    public static function getFeeds($userId, $limit=null, $since=null)
+    public static function getFeeds($userId, $limit = null, $since = null)
     {
         if ($since) {
             $cursor = $this->_collection->find(array("recipient"=>$userId, "id"=>array('$gt'=>$since)));
