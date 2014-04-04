@@ -188,10 +188,19 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public function shouldReturnComments($commentData)
     {
         $id = self::$mongologue->post('create', new \Mongologue\Models\Post($commentData));
-        $retrievedPost = self::$mongologue->post('find', 1);
-
-        $comments = self::$mongologue->post('getComments', 1);
-        $this->assertEquals($commentData["content"], $comments[0]["content"]);
+        $retrievedPost = self::$mongologue->post('find', $commentData["parent"]);
+        $commentData["id"] = $id;
+        $comments = self::$mongologue->post('getComments', $commentData["parent"]);
+        foreach ($comments as $comment) {
+            if ($comment["id"]==$id) {
+                if ($comment["content"]==$commentData["content"]) {
+                    if ($comment["datetime"]==$commentData["datetime"]) {
+                        return;
+                    }
+                }
+            }
+        }
+        $this->fail("Comments did not return properly");
     }
 
     /**
@@ -338,7 +347,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                 array(
                     "userId"=>40,
                     "datetime"=>"12.01.2014",
-                    "content"=>"hello testing comment",
+                    "content"=>"hello testing comment 2",
                     "parent"=>1,
                     "type"=>"comment",
                     "filesToBeAdded" => array(
