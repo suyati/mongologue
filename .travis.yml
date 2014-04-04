@@ -5,7 +5,9 @@ before_install:
     - sudo apt-get update
     - sudo apt-get install php-pear php5-dev
     - printf "\n" | sudo pecl install mongo
-    - php -d extension=mongo.so
+    - cat /etc/php5/cli/php.ini > php.ini
+    - echo "extension=mongo.so" >> php.ini
+    - sudo mv php.ini /etc/php5/cli/php.ini
 
 before_script:
     - composer install
