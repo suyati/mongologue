@@ -5,7 +5,7 @@ php:
 before_script:
     - composer install
 
-script: vendor/bin/phpunit --testsuite mongologue-new
+script: vendor/bin/phpunit
 
 notifications:
     email:
