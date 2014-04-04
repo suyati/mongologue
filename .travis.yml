@@ -1,6 +1,8 @@
 language: php
 php:
     - "5.5"
+services:
+  - mongodb
 before_install:
     - sudo apt-get update
     - sudo apt-get install php-pear php5-dev
