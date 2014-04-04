@@ -155,19 +155,11 @@ class Group implements Collection
         $group = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
-        if(is_null($group->parent))
-        {
-            $follower->followGroup($groupId);
-            $this->_collections->getCollectionFor("users")->update($follower);
+        $group->addFollower($followerId);
+        $this->update($group);
 
-        }
-        else
-        {
-        // print_r($group->parent);exit();
-
-            $group->addFollower($followerId);
-            $this->update($group);
-        }
+        $follower->followGroup($groupId);
+        $this->_collections->getCollectionFor("users")->update($follower);
     }
 
     /**
@@ -182,16 +174,12 @@ class Group implements Collection
     {
         $group = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
-        if(!is_null($group->parent))
-        {
-            $group->removeFollower($followerId);
-            $this->update($group);
-        }
-        else
-        {
-            $follower->unfollowGroup($groupId);
-            $this->_collections->getCollectionFor("users")->update($follower);
-        }
+
+        $group->removeFollower($followerId);
+        $this->update($group);
+
+        $follower->unfollowGroup($groupId);
+        $this->_collections->getCollectionFor("users")->update($follower);
     }
 
     /**
