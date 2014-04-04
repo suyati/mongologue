@@ -37,7 +37,7 @@ class User implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
+        $this->_collections = $collections;
         $this->_collection = $mongoCollection;
     }
 
@@ -69,10 +69,11 @@ class User implements Collection
     public function modelFromId($id)
     {
         $user = $this->_collection->findOne(array("id"=> $id));
-        if($user)
+        if ($user) {
             return new Models\User($user);
-        else
+        } else {
             throw new Exceptions\User\UserNotFoundException("User with ID $id Not Found");
+        }
     }
 
     /**
@@ -87,10 +88,11 @@ class User implements Collection
     {
         $user = $this->_collection->findOne($query);
 
-        if($user)
+        if ($user) {
             return new Models\User($user);
-        else
+        } else {
             throw new Exceptions\User\UserNotFoundException("No User Matching Query");
+        }
             
     }
 
@@ -104,13 +106,18 @@ class User implements Collection
      */
     public function register(Models\User $user)
     {
-        try
-        {
+        try {
             $temp = $this->modelFromId($user->id);
-        }
-        catch(Exceptions\User\UserNotFoundException $e)
-        {
-            $this->_collection->insert($user->document());
+        } catch (Exceptions\User\UserNotFoundException $e) {
+            $userDocument = $user->document();
+            $groups = $userDocument["groups"];
+            $userDocument["groups"] = array();
+            $this->_collection->insert($userDocument);
+            
+            foreach ($user->groups as $groupId) {
+                $this->_collections->getCollectionFor("groups")->join($groupId, $user->id);
+            }
+            
             return true;
         }
 
@@ -128,7 +135,8 @@ class User implements Collection
         $cursor = $this->_collection->find();
 
         foreach ($cursor as $document) {
-            $users[] = new Models\User($document);
+            $user = new Models\User($document);
+            $users[] = $user->document();
         }
 
         return $users;
@@ -143,10 +151,11 @@ class User implements Collection
      */
     public function find($param)
     {
-        if(is_array($param))
+        if (is_array($param)) {
             return $this->modelFromQuery($param)->document();
-        else
+        } else {
             return $this->modelFromId($param)->document();
+        }
     }
 
     /**
@@ -218,5 +227,4 @@ class User implements Collection
     {
         return call_user_func_array(array($this, $callable), $params);
     }
-
 }
