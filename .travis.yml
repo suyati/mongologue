@@ -6,3 +6,9 @@ before_script:
     - composer install
 
 script: vendor/bin/phpunit --testsuite mongologue-new
+
+notifications:
+    email:
+      - krishnanunni@suyati.com
+      - nmohanan@suyati.com
+      - tkannippoyil@suyati.com
