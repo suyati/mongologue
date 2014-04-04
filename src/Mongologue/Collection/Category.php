@@ -155,17 +155,20 @@ class Category implements Collection
     /**
      * Remove a Category
      * 
-     * @param Models\Category $category Model of the Category
+     * @param Integer $categoryId id of the Category
      *
      * @return void
      */
-    public function remove(Models\Category $category)
+    public function remove($categoryId)
     {
-        try {
-            $this->_collection->remove(array("id"=>$category->id));
-        } catch (Exceptions\Category\CategoryNotFoundException $e) {
-            throw new Exception("Category with this ID not found");
+        try
+        {
+            $this->_collection->remove(array("id"=>$categoryId));
         }
+        catch(Exceptions\Category\CategoryNotFoundException $e)
+        {
+            throw new Exception("Category with this ID not found");
+        } 
     }
 
     /**
