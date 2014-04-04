@@ -67,54 +67,16 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         $collectionNames = array(
             "users",
-            "groups"
+            "groups",
+            "inbox",
+            "category",
+            "counters"
         );
 
         $collections = $client->selectDB($dbName)->getCollectionNames();
         foreach ($collectionNames as $key => $collection) {
             $this->assertTrue(in_array($collection, $collections));
         }
-    }
-
-    /**
-     * Test if Users can be registered
-     *
-     * @test
-     * 
-     * @return void
-     */
-    public function shouldRegisterUser()
-    {
-        $userData = array(
-            "id" => 40,
-            "handle" => "tommy",
-            "firstName" => "Tommy",
-            "lastName" => "Jones"
-        );
-
-        $expectedUsersList = array(
-            new \Mongologue\Models\User(
-                array(
-                    "id" => 40,
-                    "handle" => "tommy",
-                    "firstName" => "Tommy",
-                    "lastName" => "Jones",
-                    "email" => null,
-                    "pic" => null,
-                    "following" => array(),
-                    "followers" => array(),
-                    "groups" => array(),
-                    "blocking" => array(),
-                    "followingGroups" => array(),
-                    "likes" => array(),
-                    "data" => array()
-                )
-            )
-        );
-
-        self::$mongologue->user('register', new \Mongologue\Models\User($userData));
-
-        $this->assertEquals($expectedUsersList, self::$mongologue->user('all'));
     }
 
     /**
@@ -132,9 +94,28 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     public function shouldRegisterGroupAndRetrieveByQueryAndId($groupData, $expectedDocument, $query)
     {
         $id = self::$mongologue->group('register', new \Mongologue\Models\Group($groupData));
-
         $this->assertEquals($expectedDocument, self::$mongologue->group('find', $id));
         $this->assertEquals($expectedDocument, self::$mongologue->group('find', $query));
+    }
+
+    /**
+     * Test if Users can be registered
+     *
+     * @test
+     *
+     * @depends shouldRegisterGroupAndRetrieveByQueryAndId
+     * @dataProvider provideValidUserData
+     * @return void
+     */
+    public function shouldRegisterUser($userData, $expectedDocument)
+    {
+        self::$mongologue->user('register', new \Mongologue\Models\User($userData));
+        $this->assertContains($expectedDocument, self::$mongologue->user('all'));
+
+        foreach ($expectedDocument["groups"] as $groupId) {
+            $group = self::$mongologue->group('find', $groupId);
+            $this->assertContains($expectedDocument["id"], $group["members"]);
+        }
     }
 
     /**
@@ -156,23 +137,24 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
     /**
      * Should like Posts
-     * 
-     * @test
      *
+     * @param array $postData Post Data
+     *  
+     * @test
+     * 
+     * @dataProvider providerValidPostData
      * @return void
      */
-    public function shouldLikePost()
+    public function shouldBeAbleToLikePosts($postData)
     {
-        self::$mongologue->post('like', 1, 40);
-        $retrievedPost = self::$mongologue->post('find', 1);
-        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+        $userId = 40;
+        $id = self::$mongologue->post('create', new \Mongologue\Models\Post($postData));
+        self::$mongologue->post('like', $id, $userId);
+        $retrievedPost = self::$mongologue->post('find', $id);
+        $this->assertEquals(array($userId), $retrievedPost["likes"]);
 
-        $retrievedUser = self::$mongologue->user('find', 40);
-        $this->assertEquals(array(1), $retrievedUser["likes"]);
-
-        self::$mongologue->post('like', 2, 40);
-        $retrievedPost = self::$mongologue->post('find', 2);
-        $this->assertEquals(array("40"), $retrievedPost["likes"]);
+        $retrievedUser = self::$mongologue->user('find', $userId);
+        $this->assertContains($id, $retrievedUser["likes"]);
     }
     
     /**
@@ -218,6 +200,190 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $id = self::$mongologue->category('create', new \Mongologue\Models\Category($categoryData));
         $retrievedCategory = self::$mongologue->category('find', $id);
         $this->assertEquals($categoryData["name"], $retrievedCategory["name"]);
+    }
+
+    /**
+     * should Retrieve User Feeds
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldRetrieveUserFeeds()
+    {
+        $user1 = array(
+            "id"=>"1238899884791",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899884792",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+        $user3 = array(
+            "id"=>"1238899884793",
+            "handle"=>"jdoe_3",
+            "email"=>"jdoe3@x.com",
+            "firstName"=>"John_3",
+            "lastName"=>"Doe"
+        );
+        $user4= array(
+            "id"=>"1238899884794",
+            "handle"=>"jdoe_4",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_4",
+            "lastName"=>"Doe"
+        );
+
+        $group1 = array(
+            "name" => "Cool Group 1"
+        );
+
+        $group2 = array(
+            "name" => "Cool Group 2"
+        );
+
+        $group3 = array(
+            "name" => "Cool Group 3"
+        );
+
+
+        $group1["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group1));
+        $group2["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group2));
+        $group3["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group3));
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user3));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user4));
+
+        self::$mongologue->group("join", $group1["id"], $user1["id"]);
+        self::$mongologue->group("join", $group1["id"], $user2["id"]);
+        self::$mongologue->group("join", $group2["id"], $user3["id"]);
+        self::$mongologue->group("join", $group3["id"], $user4["id"]);
+
+        self::$mongologue->user('follow', $user3["id"], $user1["id"]);
+        self::$mongologue->user('follow', $user2["id"], $user1["id"]);
+        self::$mongologue->user('follow', $user1["id"], $user3["id"]);
+
+        self::$mongologue->group('follow', $group3["id"], $user2["id"]);
+        self::$mongologue->group('follow', $group1["id"], $user3["id"]);
+        self::$mongologue->group('follow', $group1["id"], $user4["id"]);
+        
+        $post1 = array(
+            "userId"=>$user1["id"],
+            "datetime"=>"12.01.2014",
+            "content"=>"user one",
+            "filesToBeAdded" => array(
+                __DIR__."/../resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $post2 = array(
+            "userId"=>$user4["id"],
+            "datetime"=>"12.01.2014",
+            "content"=>"user four",
+        );
+
+        $post3 = array(
+            "userId"=>$user2["id"],
+            "datetime"=>"14.03.2014",
+            "content"=>"user two",
+            "filesToBeAdded" => array(
+                __DIR__."/../resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $postId1 = self::$mongologue->post('create', new \Mongologue\Models\Post($post1));
+        $postId2 = self::$mongologue->post('create', new \Mongologue\Models\Post($post2));
+        $postId3 = self::$mongologue->post('create', new \Mongologue\Models\Post($post3));
+
+        $messages = array("user one", "user four");
+
+        $res = self::$mongologue->post('find', $postId2);
+        $this->assertEquals($post2["content"], $res["content"]);
+
+        $feed = self::$mongologue->inbox('feed', $user2["id"]);
+
+        $this->assertEquals(2, count($feed));
+
+        foreach ($feed as $key => $post) {
+            $this->assertEquals($user2["id"], $post["recipient"]);
+            $this->assertContains($post["content"], $messages);
+        }
+
+    }
+
+    /**
+     * provide Valid User Data
+     * 
+     * @return array Valid User Data
+     */
+    public function provideValidUserData()
+    {
+        return array(
+            array(
+                array(
+                    "id" => 40,
+                    "handle" => "tommy",
+                    "firstName" => "Tommy",
+                    "lastName" => "Jones",
+                    "email" => "tjones@pirates.com"
+                ),
+                array(
+                    "id" => 40,
+                    "handle" => "tommy",
+                    "firstName" => "Tommy",
+                    "lastName" => "Jones",
+                    "email" => "tjones@pirates.com",
+                    "pic" => null,
+                    "following" => array(),
+                    "followers" => array(),
+                    "groups" => array(),
+                    "blocking" => array(),
+                    "followingGroups" => array(),
+                    "likes" => array(),
+                    "data" => array()
+                )
+            ),
+            array(
+                array(
+                    "id" => 440,
+                    "handle" => "ben",
+                    "firstName" => "Ben",
+                    "lastName" => "Hur",
+                    "email" => "ben@hur.com",
+                    "pic" => "thispic.com",
+                    "groups" => array(1,2)
+                ),
+                array(
+                    "id" => 440,
+                    "handle" => "ben",
+                    "firstName" => "Ben",
+                    "lastName" => "Hur",
+                    "email" => "ben@hur.com",
+                    "pic" => "thispic.com",
+                    "following" => array(),
+                    "followers" => array(),
+                    "groups" => array(1,2),
+                    "blocking" => array(),
+                    "followingGroups" => array(),
+                    "likes" => array(),
+                    "data" => array()
+                )
+            )
+        );
     }
 
     /**
