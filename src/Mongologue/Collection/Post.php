@@ -40,7 +40,7 @@ class Post implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
+        $this->_collections = $collections;
         $this->_collection = $mongoCollection;
     }
 
@@ -102,7 +102,7 @@ class Post implements Collection
      * @return void
      */
     public function saveFiles(Models\Post $post)
-    {   
+    {
         foreach ($post->filesToBeAdded() as $name => $attributes) {
             $post->addFile($this->_grid->storeFile($name, $attributes));
         }
@@ -154,7 +154,7 @@ class Post implements Collection
 
         $this->_collections->getCollectionFor("inbox")->writeToInbox($post);
         
-        return $this->savePost($post);        
+        return $this->savePost($post);
     }
 
     /**
@@ -182,10 +182,11 @@ class Post implements Collection
      */
     public function find($param)
     {
-        if(is_array($param))
+        if (is_array($param)) {
             return $this->modelFromQuery($param)->document();
-        else
+        } else {
             return $this->modelFromId($param)->document();
+        }
     }
 
     /**
@@ -199,10 +200,11 @@ class Post implements Collection
     public function modelFromId($id)
     {
         $post = $this->_collection->findOne(array("id" => $id));
-        if($post)
+        if ($post) {
             return new Models\Post($post);
-        else
+        } else {
             throw new Exceptions\Post\PostNotFoundException("Post with ID $id not found");
+        }
     }
 
 
@@ -216,7 +218,7 @@ class Post implements Collection
         $posts = array();
         $cursor = $this->_collection->find();
 
-        foreach ($$cursor as $document) {
+        foreach ($cursor as $document) {
             $posts[] = new Models\Post($document);
         }
 
@@ -253,10 +255,11 @@ class Post implements Collection
     {
         $post = $this->_collection->findOne($query);
 
-        if($post)
+        if ($post) {
             return new Models\Post($post);
-        else
+        } else {
             throw new Exceptions\Post\PostNotFoundException("No Post Matching Query");
+        }
             
     }
 
@@ -273,7 +276,7 @@ class Post implements Collection
     public function like($postId, $likedUserId)
     {
         $post = $this->modelFromId($postId);
-        if (in_array($likedUserId, $post->likes)) {    
+        if (in_array($likedUserId, $post->likes)) {
             throw new Exceptions\Post\AlreadyLikesThisPostException("User with ID $likedUserId is already being liked this post");
         } else {
             $this->_addLikedPostsToUser($likedUserId, $post->id);
@@ -329,7 +332,7 @@ class Post implements Collection
     {
         $user_collection = $this->_collections->getCollectionFor("users");
         $user = $user_collection->modelFromId($likedUserId);
-        if (in_array($likedPostId, $user->likes)) {    
+        if (in_array($likedPostId, $user->likes)) {
             throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
         } else {
                     
