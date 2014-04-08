@@ -33,6 +33,13 @@ class Post implements Collection
     private $_grid;
 
     /**
+     * Post with types specified here will not be written to the inbox
+     * 
+     * @var array
+     */
+    private $_neglectTypes = array("comment");
+
+    /**
      * Constructor function
      *
      * @param MongoColleciton $mongoCollection Mongo Collection Object
@@ -81,7 +88,7 @@ class Post implements Collection
     public function savePost(Models\Post $post)
     {
         if ($post->isComment()) {
-            $parent = $this->modelFromID((integer)$post->parent);
+            $parent = $this->modelFromID($post->parent);
             $parent->addComment($post->id);
             $this->update($parent);
         }
@@ -106,7 +113,9 @@ class Post implements Collection
             $this->_collections->getCollectionFor("counters")->nextId("posts")
         );
 
-        $this->_collections->getCollectionFor("inbox")->write($post);
+        if (!in_array($post->type, $this->_neglectTypes)) {
+            $this->_collections->getCollectionFor("inbox")->write($post);
+        }
         
         return $this->savePost($post);
     }

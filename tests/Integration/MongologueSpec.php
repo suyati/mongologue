@@ -439,9 +439,25 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             )
         );
 
+
         $postId1 = self::$mongologue->post('create', new \Mongologue\Models\Post($post1));
         $postId2 = self::$mongologue->post('create', new \Mongologue\Models\Post($post2));
         $postId3 = self::$mongologue->post('create', new \Mongologue\Models\Post($post3));
+        
+        $post4 = array(
+            "userId"=>$user1["id"],
+            "datetime"=>"14.03.2014",
+            "content"=>"user one comment",
+            "type" => "comment",
+            "parent" => $postId1,
+            "filesToBeAdded" => array(
+                __DIR__."/../resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+        $postId4 = self::$mongologue->post('create', new \Mongologue\Models\Post($post4));
 
         self::$mongologue->user("unfollow", $user4["id"], $user2["id"]);
 
