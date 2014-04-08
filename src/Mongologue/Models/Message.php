@@ -35,6 +35,7 @@ class Message extends Model
     protected $category;
     protected $files = array();
     protected $sent;
+    protected $data = array();
 
     private $_necessaryAttributes = array();
 
