@@ -279,6 +279,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             "userId"=>$user1["id"],
             "datetime"=>"12.01.2014",
             "content"=>"user one",
+            "category" => 1,
             "filesToBeAdded" => array(
                 __DIR__."/../resources/sherlock.jpg"=>array(
                     "type"=>"jpeg",
@@ -289,6 +290,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         $post2 = array(
             "userId"=>$user4["id"],
+            "category"=>2,
             "datetime"=>"12.01.2014",
             "content"=>"user four",
         );
@@ -310,7 +312,8 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $postId3 = self::$mongologue->post('create', new \Mongologue\Models\Post($post3));
 
         $messages = array("user one", "user four");
-
+        $userIds = array($user1["id"], $user4["id"]);
+        $categoryNames = array(1=>"Hello", 2=> "World");
         $res = self::$mongologue->post('find', $postId2);
         $this->assertEquals($post2["content"], $res["content"]);
 
@@ -319,9 +322,167 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($feed));
 
         foreach ($feed as $key => $post) {
-            $this->assertEquals($user2["id"], $post["recipient"]);
+            $this->assertEquals($user2["id"], $post["to"]);
+            $this->assertContains($post["user"]["id"], $userIds);
+            $this->assertContains($post["category"]["id"], array(1,2));
+            $this->assertEquals($post["category"]["name"], $categoryNames[$post["category"]["id"]]);
             $this->assertContains($post["content"], $messages);
         }
+
+    }
+
+
+    /**
+     * should Retrieve User Feeds
+     *
+     * @test
+     * 
+     * @return void
+     */
+    public function shouldRetrieveCorrectUserFeedsAfterUnfollowUser()
+    {
+        $user1 = array(
+            "id"=>"1238899884731",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899884732",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+        $user3 = array(
+            "id"=>"1238899884733",
+            "handle"=>"jdoe_3",
+            "email"=>"jdoe3@x.com",
+            "firstName"=>"John_3",
+            "lastName"=>"Doe"
+        );
+        $user4= array(
+            "id"=>"1238899884734",
+            "handle"=>"jdoe_4",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_4",
+            "lastName"=>"Doe"
+        );
+
+        $group1 = array(
+            "name" => "Cool Group 11"
+        );
+
+        $group2 = array(
+            "name" => "Cool Group 12"
+        );
+
+        $group3 = array(
+            "name" => "Cool Group 13"
+        );
+
+
+        $group1["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group1));
+        $group2["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group2));
+        $group3["id"] = self::$mongologue->group('register', new \Mongologue\Models\Group($group3));
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user3));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user4));
+
+        self::$mongologue->group("join", $group1["id"], $user1["id"]);
+        self::$mongologue->group("join", $group1["id"], $user2["id"]);
+        self::$mongologue->group("join", $group2["id"], $user3["id"]);
+        self::$mongologue->group("join", $group3["id"], $user4["id"]);
+
+        self::$mongologue->user('follow', $user3["id"], $user1["id"]);
+        self::$mongologue->user('follow', $user2["id"], $user1["id"]);
+        self::$mongologue->user('follow', $user1["id"], $user3["id"]);
+        self::$mongologue->user('follow', $user1["id"], $user4["id"]);
+        self::$mongologue->user('follow', $user4["id"], $user2["id"]);
+
+        self::$mongologue->group('follow', $group1["id"], $user3["id"]);
+        self::$mongologue->group('follow', $group1["id"], $user4["id"]);
+
+        
+        $post1 = array(
+            "userId"=>$user1["id"],
+            "datetime"=>"12.01.2014",
+            "content"=>"user one",
+            "category" => 1,
+            "filesToBeAdded" => array(
+                __DIR__."/../resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $post2 = array(
+            "userId"=>$user4["id"],
+            "category"=>2,
+            "datetime"=>"12.01.2014",
+            "content"=>"user four",
+        );
+
+        $post3 = array(
+            "userId"=>$user2["id"],
+            "datetime"=>"14.03.2014",
+            "content"=>"user two",
+            "filesToBeAdded" => array(
+                __DIR__."/../resources/sherlock.jpg"=>array(
+                    "type"=>"jpeg",
+                    "size"=>"100"
+                )
+            )
+        );
+
+        $postId1 = self::$mongologue->post('create', new \Mongologue\Models\Post($post1));
+        $postId2 = self::$mongologue->post('create', new \Mongologue\Models\Post($post2));
+        $postId3 = self::$mongologue->post('create', new \Mongologue\Models\Post($post3));
+
+        self::$mongologue->user("unfollow", $user4["id"], $user2["id"]);
+
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
+        
+        $this->assertEquals(1, count($feed_user_2));
+
+        foreach ($feed_user_2 as $key => $post) {
+            $this->assertEquals($user2["id"], $post["to"]);
+            $this->assertEquals($post["user"]["id"], $user1["id"]);
+            $this->assertEquals($post["from"], $user1["id"]);
+            $this->assertEquals($post["content"], $post1["content"]);
+        }
+
+        self::$mongologue->user("follow", $user4["id"], $user2["id"]);
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
+        
+        $this->assertEquals(2, count($feed_user_2));
+
+        $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
+        
+        $this->assertEquals(2, count($feed_user_3));
+        
+        self::$mongologue->group("unfollow", $group1["id"], $user3["id"]);
+
+        $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
+        
+        $this->assertEquals(1, count($feed_user_3));
+
+        foreach ($feed_user_3 as $key => $post) {
+            $this->assertEquals($user3["id"], $post["to"]);
+            $this->assertEquals($post["user"]["id"], $user1["id"]);
+            $this->assertEquals($post["from"], $user1["id"]);
+            $this->assertEquals($post["content"], $post1["content"]);
+        }
+
+        self::$mongologue->group("follow", $group1["id"], $user3["id"]);
+
+        $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
+        
+        $this->assertEquals(2, count($feed_user_3));
 
     }
 
@@ -542,7 +703,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             ),
             array(
                 array(
-                    "name"=>"Naveen"
+                    "name"=>"World"
                 )
             )
         );

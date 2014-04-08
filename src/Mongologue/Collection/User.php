@@ -159,6 +159,84 @@ class User implements Collection
     }
 
     /**
+     * Find all Direct and Indirect Followers of a User
+     * 
+     * @param mixed $id Id of the User
+     * 
+     * @return array List of Follower ids
+     */
+    public function followers($id)
+    {
+        $user = $this->modelFromId($id);
+        
+        $followers = $user->followers;
+        $groups = $user->groups;
+
+        foreach ($groups as $groupId) {
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members = $group->members;
+            $groupFollowers = $group->followers;
+
+            $members = array_merge(
+                array_intersect($members, $groupFollowers),
+                array_diff($members, $groupFollowers),
+                array_diff($groupFollowers, $members)
+            );
+
+            $followers = array_merge(
+                array_intersect($members, $followers),
+                array_diff($members, $followers),
+                array_diff($followers, $members)
+            );
+        }
+
+        return array_diff($followers, array($user->id));
+    }
+
+    /**
+     * Find all Subscriptions for the User
+     * 
+     * @param mixed $id Id of the User
+     * 
+     * @return array List of Following Ids
+     */
+    public function subscriptions($id)
+    {
+        $user = $this->modelFromId($id);
+
+        $following = $user->following;
+        $groups = $user->followingGroups;
+
+        foreach ($groups as $groupId) {
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members = $group->members;
+
+            $following = array_merge(
+                array_intersect($members, $following),
+                array_diff($members, $following),
+                array_diff($following, $members)
+            );
+        }
+
+        $groups = $user->groups;
+
+        foreach ($groups as $groupId) {
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members = $group->members;
+
+            $following = array_merge(
+                array_intersect($members, $following),
+                array_diff($members, $following),
+                array_diff($following, $members)
+            );
+        }
+
+
+
+        return array_diff($following, array($user->id));
+    }
+
+    /**
      * Follow a User
      * 
      * @param string $followeeId Id of the Followee
@@ -174,6 +252,7 @@ class User implements Collection
         $follower->follow($followeeId);
         $followee->addFollower($followerId);
 
+        $this->_collections->getCollectionFor("inbox")->refresh($followerId, $followeeId);
         $this->update($follower);
         $this->update($followee);
     }
@@ -196,6 +275,8 @@ class User implements Collection
 
         $this->update($follower);
         $this->update($followee);
+
+        $this->_collections->getCollectionFor("inbox")->clean($followerId, $followeeId);
     }
 
     /**

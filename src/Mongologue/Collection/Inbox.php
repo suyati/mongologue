@@ -13,6 +13,7 @@ namespace Mongologue\Collection;
 use \Mongologue\Interfaces\Collection;
 use \Mongologue\Core\Collections;
 use \Mongologue\Models;
+use \Mongologue\Models\Message;
 
 /**
  * Class Managing the Inbox Collection
@@ -41,24 +42,140 @@ class Inbox implements Collection
     }
 
     /**
+     * Clean Inbox of a User
+     * 
+     * @param mixed $to    Id of the User who is the recipient
+     * @param mixed $from  Id of the User who is the owner
+     * @param mixed $group Id of the Group who is a recipient
+     * 
+     * @return void
+     */
+    public function clean($to, $from, $group = null)
+    {
+        if (!is_null($from)) {
+            $followers = $this->_collections->getCollectionFor("users")->followers($from);
+            if (!in_array($to, $followers)) {
+                $this->remove($to, $from);
+            }
+        }
+        
+        if (!is_null($group)) {
+
+            $subscriptions = $this->_collections->getCollectionFor("users")->subscriptions($to);
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($group);
+            $members = $group->members;
+
+            $toRemove = array();
+            foreach ($members as $id) {
+                if (!in_array($id, $subscriptions)) {
+                    $toRemove[] = $id;
+                }
+            }
+
+            foreach ($toRemove as $from) {
+                $this->remove($to, $from);
+            }
+        }
+    }
+
+    public function refresh($to, $from, $group = null)
+    {
+        $subscriptions = $this->_collections->getCollectionFor("users")->subscriptions($to);
+
+        if (!is_null($from)) {
+            if (!in_array($from, $subscriptions)) {
+                $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
+                $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
+                
+                foreach ($posts as $post) {
+                    if ($post->category) {
+                        $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
+                    } else {
+                        $category = null;
+                    }
+                    
+                    $message = Message::create($post, $user, $category);
+                    $message->setRecipient($to);
+                    $this->_collection->insert($message->document());
+                }
+            }
+        }
+
+        if (!is_null($group)) {
+            $group = $this->_collections->getCollectionFor("groups")->modelFromId($group);
+            $members = $group->members;
+
+            $toAdd = array();
+            foreach ($members as $id) {
+                if (!in_array($id, $subscriptions)) {
+                    $toAdd[] = $id;
+                }
+            }
+
+            foreach ($toAdd as $from) {
+                if (!in_array($from, $subscriptions)) {
+                    $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
+                    $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
+                
+                    foreach ($posts as $post) {
+                        if ($post->category) {
+                            $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
+                        } else {
+                            $category = null;
+                        }
+                        
+                        $message = Message::create($post, $user, $category);
+                        $message->setRecipient($to);
+                        $this->_collection->insert($message->document());
+                    }
+                }
+            }
+
+        }
+    }
+
+    /**
      * Write Messages to Recipient Inbox
      * 
      * @param Models\Post $post Post Models
      * 
      * @return boolean True if Success
      */
-    public function writeToInbox(Models\Post $post)
+    public function write(Models\Post $post)
     {
-        $recipients = $post->recipients;
+        $user = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
 
+        $recipients = $this->_collections->getCollectionFor("users")->followers($user->id);
+        
+        if ($post->category) {
+            $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
+        } else {
+            $category = null;
+        }
+        
         foreach ($recipients as $recipient) {
-            $message = $post->document();
-            $message["recipient"] = $recipient;
-            $this->_collection->insert($message);
+            $message = Message::create($post, $user, $category);
+            $message->setRecipient($recipient);
+            $this->_collection->insert($message->document());
         }
 
         return true;
     }
+
+    /**
+     * Remove Messages from Inbox
+     * 
+     * @param mixed $to   Id of recipient
+     * @param mixed $from Id of sender
+     * 
+     * @return void
+     */
+    public function remove($to, $from)
+    {
+        $query = array("to"=>$to, "from"=>$from);
+        $this->_collection->remove($query);
+    }
+
 
     /**
      * Get the Post Feed For a User
@@ -71,13 +188,13 @@ class Inbox implements Collection
      */
     public function feed($userId, $limit = null, $since = null)
     {
-        $query = array("recipient" => $userId);
-        $cursor = $this->_collection->find(array("recipient"=>$userId));
+        $query = array("to" => $userId);
         if ($since) {
-            $query["id"] = array('$gt' => $since);
+            $query["post"] = array('$gt' => $since);
         }
 
-        $cursor = $cursor->sort(array("id"=>-1));
+        $cursor = $this->_collection->find($query);
+        $cursor = $cursor->sort(array("post"=>-1));
 
         if ($limit) {
             $cursor->limit((int)$limit);

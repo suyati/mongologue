@@ -155,9 +155,10 @@ class Group implements Collection
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
         $group->addFollower($followerId);
-        $this->update($group);
-
         $follower->followGroup($groupId);
+        
+        $this->_collections->getCollectionFor("inbox")->refresh($followerId, null, $groupId);
+        $this->update($group);
         $this->_collections->getCollectionFor("users")->update($follower);
     }
 
@@ -179,6 +180,8 @@ class Group implements Collection
 
         $follower->unfollowGroup($groupId);
         $this->_collections->getCollectionFor("users")->update($follower);
+
+        $this->_collections->getCollectionFor("inbox")->clean($followerId, null, $groupId);
     }
 
     /**

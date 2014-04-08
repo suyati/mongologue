@@ -57,44 +57,6 @@ class Post implements Collection
     }
 
     /**
-     * Find Recipients of Post
-     * 
-     * @param self        $post Post
-     * @param Models\User $user User Model
-     * 
-     * @return boolean True if Success
-     */
-    private function _findRecipients(Models\Post $post, Models\User $user)
-    {
-        $followers = $user->followers;
-        $groups = $user->groups;
-
-        foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
-            $members = $group->members;
-            $groupFollowers = $group->followers;
-
-            $members = array_merge(
-                array_intersect($members, $groupFollowers),
-                array_diff($members, $groupFollowers),
-                array_diff($groupFollowers, $members)
-            );
-
-            $followers = array_merge(
-                array_intersect($members, $followers),
-                array_diff($members, $followers),
-                array_diff($followers, $members)
-            );
-        }
-
-        $post->setRecipients(array_diff($followers, array($user->id)));
-        return true;
-    }
-
-
-    
-
-    /**
      * Save FIles in a Post
      * 
      * @param Models\Post $post Post Model
@@ -118,19 +80,14 @@ class Post implements Collection
      */
     public function savePost(Models\Post $post)
     {
-        $tempPost = $this->_collection->findOne(array("id"=> $post->id));
-        if ($tempPost) {
-            throw new Exceptions\Post\DuplicatePostException("Post Id already Added");
-        } else {
-            if ($post->isComment()) {
-                $parent = $this->modelFromID((integer)$post->parent);
-                $parent->addComment($post->id);
-                $this->update($parent);
-            }
-            
-            $this->saveFiles($post);
-            $this->_collection->insert($post->document());
+        if ($post->isComment()) {
+            $parent = $this->modelFromID((integer)$post->parent);
+            $parent->addComment($post->id);
+            $this->update($parent);
         }
+        
+        $this->saveFiles($post);
+        $this->_collection->insert($post->document());
 
         return $post->id;
     }
@@ -145,14 +102,11 @@ class Post implements Collection
      */
     public function create(Models\Post $post)
     {
-        $user = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
         $post->setId(
             $this->_collections->getCollectionFor("counters")->nextId("posts")
         );
-        
-        $this->_findRecipients($post, $user);
 
-        $this->_collections->getCollectionFor("inbox")->writeToInbox($post);
+        $this->_collections->getCollectionFor("inbox")->write($post);
         
         return $this->savePost($post);
     }

@@ -35,7 +35,6 @@ class Post extends Model
     protected $type;
     protected $datetime;
     protected $category;
-    protected $timer;
     protected $recipients = array();
 
     private $_filesToBeAdded = array();
@@ -57,8 +56,9 @@ class Post extends Model
     {
         parent::__construct($post);
 
-        if (isset($post["filesToBeAdded"]))
+        if (isset($post["filesToBeAdded"])) {
             $this->_filesToBeAdded = $post["filesToBeAdded"];
+        }
     }
 
     /**
@@ -116,8 +116,9 @@ class Post extends Model
      */
     public function isComment()
     {
-        if ($this->type=="comment")
+        if ($this->type=="comment") {
             return true;
+        }
         return false;
     }
 
@@ -140,10 +141,11 @@ class Post extends Model
      */
     public function addComment($postId)
     {
-        if(in_array($postId, $this->comments))
+        if (in_array($postId, $this->comments)) {
             throw new Exception("Comment Already Exists");
+        }
 
-        $this->comments[] = $postId;            
+        $this->comments[] = $postId;
     }
 
     /**

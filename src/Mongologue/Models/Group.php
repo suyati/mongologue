@@ -14,7 +14,7 @@ use \Mongologue\Interfaces\Model;
 use \Mongologue\Exceptions\Group as Exceptions;
 
 /**
- * File containing the Group Model Class
+ * Class Managing Group Properties
  *
  * @category Mongologue
  * @package  Models
