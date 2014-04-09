@@ -299,6 +299,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             "userId"=>$user2["id"],
             "datetime"=>"14.03.2014",
             "content"=>"user two",
+            "category"=>1,
             "filesToBeAdded" => array(
                 __DIR__."/../resources/sherlock.jpg"=>array(
                     "type"=>"jpeg",
@@ -311,15 +312,15 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $postId2 = self::$mongologue->post('create', new \Mongologue\Models\Post($post2));
         $postId3 = self::$mongologue->post('create', new \Mongologue\Models\Post($post3));
 
-        $messages = array("user one", "user four");
-        $userIds = array($user1["id"], $user4["id"]);
+        $messages = array("user one", "user four", "user two");
+        $userIds = array($user1["id"], $user4["id"], $user2["id"]);
         $categoryNames = array(1=>"Hello", 2=> "World");
         $res = self::$mongologue->post('find', $postId2);
         $this->assertEquals($post2["content"], $res["content"]);
 
         $feed = self::$mongologue->inbox('feed', $user2["id"]);
 
-        $this->assertEquals(2, count($feed));
+        $this->assertEquals(3, count($feed));
 
         foreach ($feed as $key => $post) {
             $this->assertEquals($user2["id"], $post["to"]);
@@ -463,19 +464,19 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
         
-        $this->assertEquals(1, count($feed_user_2));
+        $this->assertEquals(2, count($feed_user_2));
 
         foreach ($feed_user_2 as $key => $post) {
             $this->assertEquals($user2["id"], $post["to"]);
-            $this->assertEquals($post["user"]["id"], $user1["id"]);
-            $this->assertEquals($post["from"], $user1["id"]);
-            $this->assertEquals($post["content"], $post1["content"]);
+            $this->assertContains($post["user"]["id"], array($user2["id"], $user1["id"]));
+            $this->assertContains($post["from"], array($user1["id"], $user2["id"]));
+            $this->assertContains($post["content"], array($post1["content"], $post3["content"]));
         }
 
         self::$mongologue->user("follow", $user4["id"], $user2["id"]);
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
         
-        $this->assertEquals(2, count($feed_user_2));
+        $this->assertEquals(3, count($feed_user_2));
 
         $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
         
