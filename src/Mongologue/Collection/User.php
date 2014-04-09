@@ -190,7 +190,7 @@ class User implements Collection
             );
         }
 
-        return array_diff($followers, array($user->id));
+        return array_unique(array_merge($followers, array($user->id)));
     }
 
     /**
@@ -233,7 +233,7 @@ class User implements Collection
 
 
 
-        return array_diff($following, array($user->id));
+        return array_unique(array_merge($following, array($user->id)));
     }
 
     /**
