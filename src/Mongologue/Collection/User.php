@@ -237,6 +237,25 @@ class User implements Collection
     }
 
     /**
+     * Get all the Parent Groups of the groups that a User is a Part of
+     *
+     * @param Models\User $user User Model
+     * 
+     * @return array List of parent groups for the user
+     */
+    public function parentGroups(Models\User $user)
+    {
+        $parentGroups = array();
+        $groups = $user->groups;
+
+        foreach ($groups as $groupId) {
+            $parentGroups[] = $this->_collections->getCollectionFor("groups")->find($groupId);
+        }
+
+        return $parentGroups;
+    }
+
+    /**
      * Follow a User
      * 
      * @param string $followeeId Id of the Followee
