@@ -249,8 +249,8 @@ class User implements Collection
         $groups = $user->groups;
 
         foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("groups")->find($groupId);
-            $parentGroups[] = array("id"=>$group["id"], "name"=>$group["name"]);
+            $group = $this->_collections->getCollectionFor("groups")->parent($groupId, true);
+            $parentGroups[] = array("id"=>$group->id, "name"=>$group->name);
         }
 
         return $parentGroups;
