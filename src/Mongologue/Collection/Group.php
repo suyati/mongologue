@@ -265,6 +265,36 @@ class Group implements Collection
     }
 
     /**
+     * Find the Parent Group of a Group
+     * 
+     * @param mixed   $groupId   Id of the Group
+     * @param boolean $recursive Set flag to true to find the parent group recursively
+     * @param integer $iteration The iteration in which the parent search is in
+     * 
+     * @return Group Model of the Parent Group; Returns the Model of the Group itself if it is a parent
+     */
+    public function parent($groupId, $recursive = false, $iteration = 0)
+    {
+        $group = $this->modelFromId($groupId);
+
+        if ($recursive) {
+            if ($group->parent) {
+                return $this->parent($group->parent, true, ++$iteration);
+            } elseif ($iteration>0) {
+                return $group;
+            } else {
+                return $group;
+            }
+        } else {
+            if ($group->parent) {
+                return $this->modelFromId($group->parent);
+            } else {
+                return $group;
+            }
+        }
+    }
+
+    /**
      * Execute a Command and return the Results
      * 
      * @param string $callable A function of the instance
