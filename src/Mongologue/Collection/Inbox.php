@@ -203,7 +203,14 @@ class Inbox implements Collection
             $cursor->limit((int)$limit);
         }
 
-        return iterator_to_array($cursor);
+        $response = array();
+
+        foreach ($cursor as $post) {
+            $response[] = $post;
+        }
+
+        return $response;
+        //return iterator_to_array($cursor);
     }
 
     /**
