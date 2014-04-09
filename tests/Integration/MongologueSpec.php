@@ -325,6 +325,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         foreach ($feed as $key => $post) {
             $this->assertEquals($user2["id"], $post["to"]);
             $this->assertContains($post["user"]["id"], $userIds);
+            $this->assertContains($post["user"]["groups"][0]["name"], array($group1["name"], $group3["name"]));
             $this->assertContains($post["category"]["id"], array(1,2));
             $this->assertEquals($post["category"]["name"], $categoryNames[$post["category"]["id"]]);
             $this->assertContains($post["content"], $messages);
