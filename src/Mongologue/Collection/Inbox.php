@@ -86,6 +86,7 @@ class Inbox implements Collection
             if (!in_array($from, $subscriptions)) {
                 $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
                 $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
+                $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                 foreach ($posts as $post) {
                     if ($post->category) {
@@ -94,7 +95,7 @@ class Inbox implements Collection
                         $category = null;
                     }
                     
-                    $message = Message::create($post, $user, $category);
+                    $message = Message::create($post, $user, $category, $parentGroups);
                     $message->setRecipient($to);
                     $this->_collection->insert($message->document());
                 }
@@ -116,6 +117,7 @@ class Inbox implements Collection
                 if (!in_array($from, $subscriptions)) {
                     $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
                     $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
+                    $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                     foreach ($posts as $post) {
                         if ($post->category) {
@@ -124,7 +126,7 @@ class Inbox implements Collection
                             $category = null;
                         }
                         
-                        $message = Message::create($post, $user, $category);
+                        $message = Message::create($post, $user, $category, $parentGroups);
                         $message->setRecipient($to);
                         $this->_collection->insert($message->document());
                     }
@@ -144,6 +146,7 @@ class Inbox implements Collection
     public function write(Models\Post $post)
     {
         $user = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
+        $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
 
         $recipients = $this->_collections->getCollectionFor("users")->followers($user->id);
         
@@ -154,7 +157,7 @@ class Inbox implements Collection
         }
         
         foreach ($recipients as $recipient) {
-            $message = Message::create($post, $user, $category);
+            $message = Message::create($post, $user, $category, $parentGroups);
             $message->setRecipient($recipient);
             $this->_collection->insert($message->document());
         }

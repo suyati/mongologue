@@ -48,12 +48,14 @@ class Message extends Model
      * 
      * @return Message Message Model Object
      */
-    public static function create(Post $post, User $user, Category $category = null)
+    public static function create(Post $post, User $user, Category $category = null, array $parentGroups = null)
     {
         $document = $post->document();
         
         $document["post"] = $document["id"];
         $document["user"] = $user->document();
+        $document["user"]["groups"] = $parentGroups;
+        
         $document["from"] = $user->id;
         
         $document["likes"] = count($document["likes"]);
