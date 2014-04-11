@@ -82,7 +82,7 @@ class Post extends Model
      */
     public function addFile($file)
     {
-        $this->files[] = $file;
+        $this->files[] = (string)$file;
     }
 
     /**
