@@ -112,12 +112,14 @@ class Post implements Collection
         $post->setId(
             $this->_collections->getCollectionFor("counters")->nextId("posts")
         );
+        $postId = $this->savePost($post);
+        $savedPost = $this->modelFromId($postId);
 
-        if (!in_array($post->type, $this->_neglectTypes)) {
-            $this->_collections->getCollectionFor("inbox")->write($post);
+        if (!in_array($savedPost->type, $this->_neglectTypes)) {
+            $this->_collections->getCollectionFor("inbox")->write($savedPost);
         }
         
-        return $this->savePost($post);
+        return $postId;
     }
 
     /**
