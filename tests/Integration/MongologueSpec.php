@@ -329,6 +329,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
             $this->assertContains($post["category"]["id"], array(1,2));
             $this->assertEquals($post["category"]["name"], $categoryNames[$post["category"]["id"]]);
             $this->assertContains($post["content"], $messages);
+
+            if (count($post["files"])>0) {
+                foreach ($post["files"] as $file) {
+                    $img = self::$mongologue->post('getImage', $file);
+                    $this->assertStringEqualsFile(__DIR__."/../resources/sherlock.jpg", $img->getBytes());
+                }
+            }
         }
 
     }
