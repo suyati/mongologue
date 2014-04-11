@@ -277,9 +277,9 @@ class Post implements Collection
      *  
      * @return Array of Image 
      */
-    public function getImage(\MongoId $fileId)
+    public function getImage($fileId)
     {
-        return $this->_grid->findOne(array('_id' =>$fileId));
+        return $this->_grid->findOne(array('_id' =>new \MongoId($fileId)));
     }
 
     /**
