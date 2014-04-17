@@ -157,9 +157,12 @@ class Inbox implements Collection
         }
         
         foreach ($recipients as $recipient) {
-            $message = Message::create($post, $user, $category, $parentGroups);
-            $message->setRecipient($recipient);
-            $this->_collection->insert($message->document());
+            $toUser = $this->_collections->getCollectionFor("users")->modelFromId($recipient);
+            if (!in_array($user->id, $toUser->blocking)) {
+                $message = Message::create($post, $user, $category, $parentGroups);
+                $message->setRecipient($recipient);
+                $this->_collection->insert($message->document());
+            }
         }
 
         return true;

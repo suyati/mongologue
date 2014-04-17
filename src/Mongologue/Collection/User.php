@@ -230,11 +230,7 @@ class User implements Collection
                 array_diff($following, $members)
             );
         }
-
-
-
-        $myFollowers = array_unique(array_merge($following, array($user->id)));
-        return array_diff($myFollowers, $user->blocking);
+        return array_unique(array_merge($following, array($user->id)));
     }
 
     /**
@@ -316,7 +312,7 @@ class User implements Collection
 
         $this->update($blocker);
      
-        $this->_collections->getCollectionFor("inbox")->clean($blockerId, $blockeeId);
+        $this->_collections->getCollectionFor("inbox")->remove($blockerId, $blockeeId);
     }
 
     /**
