@@ -44,6 +44,7 @@ class Factory
         $posts = new Collection\Post($db->createCollection("posts"), $collections);
         $inbox = new Collection\Inbox($db->createCollection("inbox"), $collections);
         $category = new Collection\Category($db->createCollection("category"), $collections);
+        $notification = new Collection\Notification($db->createCollection("notification"), $collections);
         
         $counters = new Collection\Counter($db->createCollection("counters"), $collections);
         
@@ -54,15 +55,17 @@ class Factory
         $collections->registerCollection("posts", $posts);
         $collections->registerCollection("inbox", $inbox);
         $collections->registerCollection("category", $category);
+        $collections->registerCollection("notification", $notification);
 
         $collections->registerCollection("counters", $counters);
 
         return new \Mongologue\Core\Mongologue(
             $users,
             $groups,
-            $posts, 
+            $posts,
             $inbox,
-            $category
+            $category,
+            $notification
         );
     }
 }

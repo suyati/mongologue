@@ -108,6 +108,23 @@ class User extends Model
     }
 
     /**
+     * Block User
+     * 
+     * @param string $userId block user id
+     * 
+     * @return void
+     */
+    public function block($userId)
+    {
+        if (in_array($userId, $this->blocking)) {
+            throw new Exceptions\AlreadyBlockingException("This User $userId is already Being Blocked");
+        }
+
+        $this->blocking[] = $userId;
+
+    }
+
+    /**
      * Unfollow a Group
      * 
      * @param string $groupId Id of the Group to unfollow

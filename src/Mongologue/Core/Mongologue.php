@@ -30,6 +30,7 @@ class Mongologue
     private $_postCollection;
     private $_inboxCollection;
     private $_categoryCollection;
+    private $_notificationCollection;
 
     /**
      * Constructor of the Class
@@ -40,13 +41,14 @@ class Mongologue
      * @param Collection\Inbox    $inboxCollection    [description]
      * @param Collection\Category $categoryCollection [description]
      */
-    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection, Collection\Category $categoryCollection)
+    public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection, Collection\Category $categoryCollection, Collection\Notification $notificationCollection)
     {
         $this->_userCollection = $userCollection;
         $this->_groupCollection = $groupCollection;
         $this->_postCollection = $postCollection;
         $this->_inboxCollection = $inboxCollection;
         $this->_categoryCollection = $categoryCollection;
+        $this->_notificationCollection = $notificationCollection;
     }
 
     /**
@@ -112,5 +114,18 @@ class Mongologue
     {
         $params = array_slice(func_get_args(), 1);
         return $this->_categoryCollection->execute($callable, $params);
+    }
+
+    /**
+     * Allows Executing Functions on Notification Collections
+     * 
+     * @param mixed $callable Executable Command for the Collection
+     * 
+     * @return mixed Result of Executed Command
+     */
+    public function notification($callable)
+    {
+        $params = array_slice(func_get_args(), 1);
+        return $this->_notificationCollection->execute($callable, $params);
     }
 }

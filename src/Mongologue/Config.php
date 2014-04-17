@@ -31,5 +31,5 @@ class Config
     const CATEGORY_COLLECTION = "category";
     const INBOX_COLLECTION = "inbox";
     const PREMADEPOST_COLLECTION = "premadepost";
+    const NOTIFICATION_COLLECTION = "notification";
 }
-?>

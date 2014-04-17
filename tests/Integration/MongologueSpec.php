@@ -511,6 +511,54 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
     }
 
+    
+    /**
+     * Should save the notifications
+     * 
+     * @test
+     *
+     * @return void
+     */
+    public function shouldSaveNotifications()
+    {
+        $notification1 = array(
+                    "notifierId" => 440,
+                    "message" => "test notification 1",
+                    "userId" => 441,
+                    "userPic" => "/test/test.png",
+                    "postId" => 1,
+                    "postImage" => "qwe12eqd234sdf3r32312",
+                    "type" => "like"
+                );
+
+        $notification2 = array(
+                    "notifierId" => 440,
+                    "message" => "test notification 2",
+                    "userId" => 441,
+                    "userPic" => "/test/test.png",
+                    "type" => "follow"
+                );
+        $notification3 = array(
+                    "notifierId" => 442,
+                    "message" => "test notification 3",
+                    "userId" => 441,
+                    "userPic" => "/test/test.png",
+                    "type" => "follow"
+                );
+
+        self::$mongologue->notification('create', new \Mongologue\Models\Notification($notification1));
+        self::$mongologue->notification('create', new \Mongologue\Models\Notification($notification2));
+        self::$mongologue->notification('create', new \Mongologue\Models\Notification($notification3));
+
+
+        $notifications = self::$mongologue->notification('get', $notification1["notifierId"]);
+        
+        $this->assertEquals(2, count($notifications));
+        $this->assertContains("test notification 1", $notifications[0]);
+        $this->assertContains("test notification 2", $notifications[1]);
+
+    }
+
     /**
      * provide Valid User Data
      * 
