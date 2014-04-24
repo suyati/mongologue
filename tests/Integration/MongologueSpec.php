@@ -277,7 +277,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         
         $post1 = array(
             "userId"=>$user1["id"],
-            "datetime"=>"12.01.2014",
+            "datetime"=>time(),
             "content"=>"user one",
             "category" => 1,
             "filesToBeAdded" => array(
@@ -291,13 +291,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $post2 = array(
             "userId"=>$user4["id"],
             "category"=>2,
-            "datetime"=>"12.01.2014",
+            "datetime"=>time(),
             "content"=>"user four",
         );
 
         $post3 = array(
             "userId"=>$user2["id"],
-            "datetime"=>"14.03.2014",
+            "datetime"=>time(),
             "content"=>"user two",
             "category"=>1,
             "filesToBeAdded" => array(
@@ -418,7 +418,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         
         $post1 = array(
             "userId"=>$user1["id"],
-            "datetime"=>"12.01.2014",
+            "datetime"=>1398321700,
             "content"=>"user one",
             "category" => 1,
             "filesToBeAdded" => array(
@@ -432,13 +432,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $post2 = array(
             "userId"=>$user4["id"],
             "category"=>2,
-            "datetime"=>"12.01.2014",
+            "datetime"=>1398321701,
             "content"=>"user four",
         );
 
         $post3 = array(
             "userId"=>$user2["id"],
-            "datetime"=>"14.03.2014",
+            "datetime"=>1398321702,
             "content"=>"user two",
             "filesToBeAdded" => array(
                 __DIR__."/../resources/sherlock.jpg"=>array(
@@ -455,7 +455,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         
         $post4 = array(
             "userId"=>$user1["id"],
-            "datetime"=>"14.03.2014",
+            "datetime"=>1398321703,
             "content"=>"user one comment",
             "type" => "comment",
             "parent" => $postId1,
@@ -486,10 +486,44 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         
         $this->assertEquals(3, count($feed_user_2));
 
-        $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
+
+        //checking the order of user feeds
         
-        $this->assertEquals(2, count($feed_user_3));
-        
+
+        //limit test
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 2);
+        $this->assertEquals(2, count($feed_user_2));
+
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 10);
+        $this->assertEquals(3, count($feed_user_2));
+
+        //since test
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1);
+        $since1 = $feed_user_2[0]["sent"];
+
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1, $since1);
+        $since2 = $feed_user_2[0]["sent"];
+        $this->assertTrue($since1 != $since2);
+
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1, $since2);
+        $since3 = $feed_user_2[0]["sent"];
+        $this->assertTrue($since1 != $since2 && $since1 != $since3 && $since3 != $since2);
+
+        //upto test
+
+        $upto = $since3;
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], null, null, $upto);
+        $this->assertEquals(2, count($feed_user_2));
+
+        $upto = $since2;
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], null, null, $upto);
+        $this->assertEquals(1, count($feed_user_2));
+
+        $upto = $since1;
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], null, null, $upto);
+        $this->assertEquals(0, count($feed_user_2));
+
+
         self::$mongologue->group("unfollow", $group1["id"], $user3["id"]);
 
         $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);

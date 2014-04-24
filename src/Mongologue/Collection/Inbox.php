@@ -192,15 +192,17 @@ class Inbox implements Collection
      * 
      * @return array List of Posts in Feed
      */
-    public function feed($userId, $limit = null, $since = null)
+    public function feed($userId, $limit = null, $since = null, $upto = null)
     {
         $query = array("to" => $userId);
         if ($since) {
-            $query["post"] = array('$gt' => $since);
+            $query["sent"] = array('$lt' => $since);
+        } elseif ($upto) {
+            $query["sent"] = array('$gt' => $upto);
         }
 
         $cursor = $this->_collection->find($query);
-        $cursor = $cursor->sort(array("post"=>-1));
+        $cursor = $cursor->sort(array("sent"=>-1));
 
         if ($limit) {
             $cursor->limit((int)$limit);
