@@ -499,14 +499,14 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         //since test
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1);
-        $since1 = $feed_user_2[0]["sent"];
+        $since1 = $feed_user_2[0]["post"];
 
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1, $since1);
-        $since2 = $feed_user_2[0]["sent"];
+        $since2 = $feed_user_2[0]["post"];
         $this->assertTrue($since1 != $since2);
 
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"], 1, $since2);
-        $since3 = $feed_user_2[0]["sent"];
+        $since3 = $feed_user_2[0]["post"];
         $this->assertTrue($since1 != $since2 && $since1 != $since3 && $since3 != $since2);
 
         //upto test

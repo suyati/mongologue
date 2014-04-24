@@ -196,13 +196,13 @@ class Inbox implements Collection
     {
         $query = array("to" => $userId);
         if ($since) {
-            $query["sent"] = array('$lt' => $since);
+            $query["post"] = array('$lt' => $since);
         } elseif ($upto) {
-            $query["sent"] = array('$gt' => $upto);
+            $query["post"] = array('$gt' => $upto);
         }
 
         $cursor = $this->_collection->find($query);
-        $cursor = $cursor->sort(array("sent"=>-1));
+        $cursor = $cursor->sort(array("post"=>-1));
 
         if ($limit) {
             $cursor->limit((int)$limit);
