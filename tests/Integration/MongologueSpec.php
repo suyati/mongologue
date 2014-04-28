@@ -594,6 +594,64 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Should save the notifications
+     * 
+     * @test
+     *
+     * @return void
+     */
+    public function shouldNotReturnCommentsInFeeds()
+    {
+        $user1 = array(
+            "id"=>"2238899884731",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"2238899884732",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+        $post1 = array(
+            "userId"=>$user1["id"],
+            "category"=>2,
+            "datetime"=>1398321701,
+            "content"=>"user one post"
+        );
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+
+        $postId1 = self::$mongologue->post('create', new \Mongologue\Models\Post($post1));
+
+        $comment1 = array(
+            "userId"=>$user1["id"],
+            "type"=>"comment",
+            "category"=>2,
+            "parent"=>$postId1,
+            "datetime"=>1398321701,
+            "content"=>"user one comment"
+        );
+        $commentId1 = self::$mongologue->post('create', new \Mongologue\Models\Post($comment1));
+        
+        self::$mongologue->user('follow', $user1["id"], $user2["id"]);
+        
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
+        $this->assertEquals(1, count($feed_user_2));
+
+        self::$mongologue->user('unfollow', $user1["id"], $user2["id"]);
+        self::$mongologue->user('follow', $user1["id"], $user2["id"]);
+        
+        $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
+        $this->assertEquals(1, count($feed_user_2));
+
+
+    }
+    /**
      * provide Valid User Data
      * 
      * @return array Valid User Data
