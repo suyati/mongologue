@@ -89,6 +89,9 @@ class Inbox implements Collection
                 $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                 foreach ($posts as $post) {
+                    if ($post->isComment()) {
+                        continue;
+                    }
                     if ($post->category) {
                         $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
                     } else {
@@ -120,6 +123,9 @@ class Inbox implements Collection
                     $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                     foreach ($posts as $post) {
+                        if ($post->isComment()) {
+                            continue;
+                        }
                         if ($post->category) {
                             $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
                         } else {
