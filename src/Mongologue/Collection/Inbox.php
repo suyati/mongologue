@@ -84,14 +84,11 @@ class Inbox implements Collection
 
         if (!is_null($from)) {
             if (!in_array($from, $subscriptions)) {
-                $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
+                $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from, "parent" => null));
                 $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
                 $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                 foreach ($posts as $post) {
-                    if ($post->isComment()) {
-                        continue;
-                    }
                     if ($post->category) {
                         $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
                     } else {
@@ -118,14 +115,11 @@ class Inbox implements Collection
 
             foreach ($toAdd as $from) {
                 if (!in_array($from, $subscriptions)) {
-                    $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from));
+                    $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from, "parent" => null));
                     $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
                     $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                     foreach ($posts as $post) {
-                        if ($post->isComment()) {
-                            continue;
-                        }
                         if ($post->category) {
                             $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
                         } else {
