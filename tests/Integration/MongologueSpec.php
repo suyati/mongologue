@@ -547,6 +547,35 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
     
     /**
+     * Should return feeds from query
+     * 
+     * @test
+     *
+     * @return void
+     */
+    public function shouldGetFeedsFromQuery()
+    {
+        $user11 = array(
+            "id"=>"1238899884761",
+            "handle"=>"jdoe_11",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_11",
+            "lastName"=>"Doe"
+        );
+        $post11 = array(
+            "userId"=> "1238899884761",
+            "datetime"=>1398321703,
+            "content"=> "New post to feeds",
+            "type" => "post"
+        );
+        self::$mongologue->user('register', new \Mongologue\Models\User($user11));
+        $postId11 = self::$mongologue->post('create', new \Mongologue\Models\Post($post11));
+        $feed = self::$mongologue->inbox('find', array("post" => $postId11));
+        $this->assertEquals(14, count($feed));
+        $this->assertEquals($postId11, $feed["post"]);
+        $this->assertEquals($user11["id"], $feed["from"]);
+    }
+    /**
      * Should save the notifications
      * 
      * @test

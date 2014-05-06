@@ -215,7 +215,24 @@ class Inbox implements Collection
         }
 
         return $response;
-        //return iterator_to_array($cursor);
+    }
+
+    /**
+     * Get a Inbox Model using a Query
+     * 
+     * @param array $query Query for the model
+     *
+     * @return Models\Inbox Model of the matching  query
+     */
+    public function find(array $query)
+    {
+        $feed = $this->_collection->findOne($query);
+
+        if ($feed) {
+            return $feed;
+        } else {
+            throw new \Exception("No feed Matching Query");
+        }
     }
 
     /**
