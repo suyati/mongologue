@@ -316,6 +316,25 @@ class User implements Collection
     }
 
     /**
+     * unfollow a User's posts
+     * 
+     * @param string $unfolloweeId Id of the unfollowee
+     * @param string $unfollowerId Id of the unfollower
+     * 
+     * @return void
+     */
+    public function unfollowPosts($unfolloweeId, $unfollowerId)
+    {
+        $unfollower = $this->modelFromId($unfollowerId);
+
+        $unfollower->postUnfollow($unfolloweeId);
+
+        $this->update($unfollower);
+     
+        $this->_collections->getCollectionFor("inbox")->remove($unfollowerId, $unfolloweeId);
+    }
+
+    /**
      * Execute a Command and return the Results
      * 
      * @param string $callable A function of the instance

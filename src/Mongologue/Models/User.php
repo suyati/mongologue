@@ -37,6 +37,7 @@ class User extends Model
     protected $followers = array();
     protected $groups = array();
     protected $blocking = array();
+    protected $postUnfollowing = array();
     protected $followingGroups = array();
     protected $likes = array();
 
@@ -119,9 +120,24 @@ class User extends Model
         if (in_array($userId, $this->blocking)) {
             throw new Exceptions\AlreadyBlockingException("This User $userId is already Being Blocked");
         }
-
+        
         $this->blocking[] = $userId;
+    }
 
+    /**
+     * Unfollow User's posts
+     * 
+     * @param string $userId unfollow user id
+     * 
+     * @return void
+     */
+    public function postUnfollow($userId)
+    {
+        if (in_array($userId, $this->postUnfollowing)) {
+            throw new Exceptions\AlreadyUnfollowingPostsException("This User $userId is already unfollowed posts");
+        }
+
+        $this->postUnfollowing[] = $userId;
     }
 
     /**

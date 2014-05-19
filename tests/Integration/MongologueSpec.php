@@ -341,6 +341,43 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
     }
 
 
+
+    /**
+     * should unfollow User's posts
+     *
+     * @test
+     * 
+     * @expectedException Mongologue\Exceptions\User\AlreadyUnfollowingPostsException
+     * @return void
+     */
+    public function shouldUnfollowPosts()
+    {
+        $user1 = array(
+            "id"=>"1238899804731",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899804732",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+
+        self::$mongologue->user('unfollowPosts', $user1["id"], $user2["id"]);
+
+        $user2Data = self::$mongologue->user("find", $user2["id"]);
+        $this->assertContains($user1["id"], $user2Data["postUnfollowing"]);
+
+        self::$mongologue->user('unfollowPosts', $user1["id"], $user2["id"]);
+    }
+
     /**
      * should Retrieve User Feeds
      *
@@ -707,6 +744,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "followers" => array(),
                     "groups" => array(),
                     "blocking" => array(),
+                    "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
                     "data" => array()
@@ -733,6 +771,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "followers" => array(),
                     "groups" => array(1,2),
                     "blocking" => array(),
+                    "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
                     "data" => array()

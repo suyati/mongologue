@@ -87,6 +87,7 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
                     "followers" => array(),
                     "groups" => array(),
                     "blocking" => array(),
+                    "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
                     "data" => array()
@@ -115,6 +116,7 @@ class UserModelSpec extends \PHPUnit_Framework_TestCase
                     "followers" => array(),
                     "groups" => array(33),
                     "blocking" => array(),
+                    "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
                     "data" => array("userPages"=>array("A", "B"))
