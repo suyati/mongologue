@@ -336,6 +336,8 @@ class User implements Collection
         $unfollower->postUnfollow($unfolloweeId);
 
         $this->update($unfollower);
+
+        $this->_collections->getCollectionFor("inbox")->remove($unfollowerId, $unfolloweeId);
     }
 
     /**
@@ -356,9 +358,6 @@ class User implements Collection
      
         $this->_collections->getCollectionFor("inbox")->refresh($blockerId, $blockeeId);
         $this->_collections->getCollectionFor("inbox")->refresh($blockeeId, $blockerId);
-
-        $this->_collections->getCollectionFor("notification")->remove($blockerId, $blockeeId);
-        $this->_collections->getCollectionFor("notification")->remove($blockeeId, $blockerId);
     }
 
     /**
