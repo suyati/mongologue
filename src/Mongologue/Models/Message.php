@@ -50,22 +50,22 @@ class Message extends Model
      */
     public static function create(Post $post, User $user, Category $category = null, array $parentGroups = null)
     {
-        $document = $post->document();
+        $document                   = $post->document();
         
-        $document["post"] = $document["id"];
-        $document["user"] = $user->document();
+        $document["post"]           = $document["id"];
+        $document["user"]           = $user->document();
         $document["user"]["groups"] = $parentGroups;
         
-        $document["from"] = $user->id;
+        $document["from"]           = $user->id;
         
-        $document["likes"] = count($document["likes"]);
-        $document["comments"] = count($document["comments"]);
+        $document["likes"]          = count($document["likes"]);
+        $document["comments"]       = count($document["comments"]);
 
         if ($category) {
-            $document["category"] = $category->document();
+            $document["category"]   = $category->document();
         }
 
-        $document["sent"] = $document["datetime"];
+        $document["sent"]           = $document["datetime"];
 
         return new self($document);
     }

@@ -38,7 +38,7 @@ class Inbox implements Collection
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
         $this->_collections = $collections;
-        $this->_collection = $mongoCollection;
+        $this->_collection  = $mongoCollection;
     }
 
     /**
@@ -60,17 +60,9 @@ class Inbox implements Collection
         }
         
         if (!is_null($group)) {
-
             $subscriptions = $this->_collections->getCollectionFor("users")->subscriptions($to);
             $group         = $this->_collections->getCollectionFor("groups")->modelFromId($group);
-            $members       = $group->members;
-
-            $toRemove = array();
-            foreach ($members as $id) {
-                if (!in_array($id, $subscriptions)) {
-                    $toRemove[] = $id;
-                }
-            }
+            $toRemove      = array_diff($group->members, $subscriptions);
 
             foreach ($toRemove as $from) {
                 $this->remove($to, $from);
@@ -81,6 +73,7 @@ class Inbox implements Collection
     public function refresh($to, $from, $group = null)
     {
         $subscriptions = $this->_collections->getCollectionFor("users")->subscriptions($to);
+        $toUser        = $this->_collections->getCollectionFor("users")->modelFromId($to);
 
         if (!is_null($from)) {
             if (!in_array($from, $subscriptions)) {
@@ -89,42 +82,23 @@ class Inbox implements Collection
                 $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                 foreach ($posts as $post) {
-                    if ($post->category) {
-                        $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
-                    } else {
-                        $category = null;
-                    }
-                    $toUser = $this->_collections->getCollectionFor("users")->modelFromId($to);
-                    $this->_createMessage($post, $user, $category, $parentGroups, $toUser);
+                    $this->_createMessage($post, $user, $parentGroups, $toUser);
                 }
             }
         }
 
         if (!is_null($group)) {
             $group = $this->_collections->getCollectionFor("groups")->modelFromId($group);
-            $members = $group->members;
-
-            $toAdd = array();
-            foreach ($members as $id) {
-                if (!in_array($id, $subscriptions)) {
-                    $toAdd[] = $id;
-                }
-            }
+            $toAdd = array_diff($group->members, $toUser->blocking, $subscriptions);
 
             foreach ($toAdd as $from) {
                 if (!in_array($from, $subscriptions)) {
-                    $posts = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from, "parent" => null));
-                    $user = $this->_collections->getCollectionFor("users")->modelFromId($from);
+                    $posts        = $this->_collections->getCollectionFor("posts")->search(array("userId"=>$from, "parent" => null));
+                    $user         = $this->_collections->getCollectionFor("users")->modelFromId($from);
                     $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
                 
                     foreach ($posts as $post) {
-                        if ($post->category) {
-                            $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
-                        } else {
-                            $category = null;
-                        }
-                        $toUser = $this->_collections->getCollectionFor("users")->modelFromId($to);
-                        $this->_createMessage($post, $user, $category, $parentGroups, $toUser);
+                        $this->_createMessage($post, $user, $parentGroups, $toUser);
                     }
                 }
             }
@@ -154,7 +128,7 @@ class Inbox implements Collection
         
         foreach ($recipients as $recipient) {
             $toUser = $this->_collections->getCollectionFor("users")->modelFromId($recipient);
-            $this->_createMessage($post, $user, $category, $parentGroups, $toUser);
+            $this->_createMessage($post, $user, $parentGroups, $toUser);
         }
 
         return true;
@@ -165,14 +139,18 @@ class Inbox implements Collection
      * 
      * @param  array $post         post details
      * @param  array $user         owner details
-     * @param  array $category     category details
      * @param  array $parentGroups parent group details
      * @param  array $toUser       to users details
      * 
      * @return void               
      */
-    private function _createMessage($post, $user, $category, $parentGroups, $toUser)
+    private function _createMessage($post, $user, $parentGroups, $toUser)
     {
+        if ($post->category) {
+            $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
+        } else {
+            $category = null;
+        }
         if (!in_array($user->id, array_merge($toUser->blocking, $toUser->postUnfollowing))) {
             $message = Message::create($post, $user, $category, $parentGroups);
             $message->setRecipient($toUser->id);
