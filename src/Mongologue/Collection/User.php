@@ -190,7 +190,8 @@ class User implements Collection
             );
         }
 
-        return array_unique(array_merge($followers, array($user->id)));
+        $myfollowers = array_unique(array_merge($followers, array($user->id)));
+        return array_diff($myfollowers, $user->blocking);
     }
 
     /**
@@ -230,7 +231,8 @@ class User implements Collection
                 array_diff($following, $members)
             );
         }
-        return array_unique(array_merge($following, array($user->id)));
+        $mysubscriptions = array_unique(array_merge($following, array($user->id)));
+        return array_diff($mysubscriptions, $user->blocking);
     }
 
     /**
@@ -313,6 +315,10 @@ class User implements Collection
         $this->update($blocker);
      
         $this->_collections->getCollectionFor("inbox")->remove($blockerId, $blockeeId);
+        $this->_collections->getCollectionFor("inbox")->remove($blockeeId, $blockerId);
+
+        $this->_collections->getCollectionFor("notification")->remove($blockerId, $blockeeId);
+        $this->_collections->getCollectionFor("notification")->remove($blockeeId, $blockerId);
     }
 
     /**
@@ -330,8 +336,46 @@ class User implements Collection
         $unfollower->postUnfollow($unfolloweeId);
 
         $this->update($unfollower);
+    }
+
+    /**
+     * UnBlock a User
+     * 
+     * @param string $blockeeId Id of the Blockee
+     * @param string $blockerId Id of the Blocker
+     * 
+     * @return void
+     */
+    public function unblock($blockeeId, $blockerId)
+    {
+        $blocker = $this->modelFromId($blockerId);
+
+        $blocker->unblock($blockeeId);
+
+        $this->update($blocker);
      
-        $this->_collections->getCollectionFor("inbox")->remove($unfollowerId, $unfolloweeId);
+        $this->_collections->getCollectionFor("inbox")->refresh($blockerId, $blockeeId);
+        $this->_collections->getCollectionFor("inbox")->refresh($blockeeId, $blockerId);
+
+        $this->_collections->getCollectionFor("notification")->remove($blockerId, $blockeeId);
+        $this->_collections->getCollectionFor("notification")->remove($blockeeId, $blockerId);
+    }
+
+    /**
+     * undo unfollow a User's posts
+     * 
+     * @param string $unfolloweeId Id of the unfollowee
+     * @param string $unfollowerId Id of the unfollower
+     * 
+     * @return void
+     */
+    public function refollowPosts($unfolloweeId, $unfollowerId)
+    {
+        $unfollower = $this->modelFromId($unfollowerId);
+
+        $unfollower->postRefollow($unfolloweeId);
+
+        $this->update($unfollower);
     }
 
     /**

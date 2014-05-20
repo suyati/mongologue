@@ -5,6 +5,7 @@
  * @category Mongologue
  * @package  Collection
  * @author   @kpnunni <krishnanunni@suyati.com>
+ * @author   @tkannippoyil <tkannippoyil@suyati.com>
  * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
  */
@@ -21,6 +22,7 @@ use \Mongologue\Exceptions;
  * @category Mongologue
  * @package  Collection
  * @author   @kpnunni <krishnanunni@suyati.com>
+ * @author   @tkannippoyil <tkannippoyil@suyati.com>
  * @license  none http://github.com/suyati/mongologue
  * @link     http://github.com/suyati/mongologue
  */
@@ -38,7 +40,7 @@ class Notification implements Collection
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
         $this->_collections = $collections;
-        $this->_collection = $mongoCollection;
+        $this->_collection  = $mongoCollection;
     }
 
     /**
@@ -83,6 +85,23 @@ class Notification implements Collection
         }
 
         return $response;
+    }
+
+    /**
+     * Remove notification
+     * 
+     * @param string $notifierId Id of the notifier
+     * @param string $userId Id of the notifiee
+     * 
+     * @return void
+     */
+    public function remove($notifierId, $userId)
+    {
+        $query = array(
+                       "notifierId" => $notifierId,
+                       "userId"     => $userId
+                );
+        $this->_collection->remove($query);
     }
 
     /**

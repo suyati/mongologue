@@ -141,6 +141,38 @@ class User extends Model
     }
 
     /**
+     * Unblock User
+     * 
+     * @param string $userId unblock user id
+     * 
+     * @return void
+     */
+    public function unblock($userId)
+    {
+        if (!in_array($userId, $this->blocking)) {
+            throw new Exceptions\AlreadyUnBlockingException("This User $userId is already Being unblocked");
+        }
+        
+        $this->blocking = array_diff($this->blocking, array($userId));
+    }
+
+    /**
+     * undo unfollow User's posts
+     * 
+     * @param string $userId follow user id
+     * 
+     * @return void
+     */
+    public function postRefollow($userId)
+    {
+        if (!in_array($userId, $this->postUnfollowing)) {
+            throw new Exceptions\AlreadyRefollowingPostsException("This User $userId is already re-followed posts");
+        }
+
+        $this->postUnfollowing = array_diff($this->postUnfollowing, array($userId));
+    }
+
+    /**
      * Unfollow a Group
      * 
      * @param string $groupId Id of the Group to unfollow

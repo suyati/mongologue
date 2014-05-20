@@ -375,7 +375,119 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         $user2Data = self::$mongologue->user("find", $user2["id"]);
         $this->assertContains($user1["id"], $user2Data["postUnfollowing"]);
 
+        self::$mongologue->user('unfollowPosts', $user1["id"], $user2["id"]);//duplicate unfollow exception
+    }
+
+    /**
+     * should refollow User's posts
+     *
+     * @test
+     * 
+     * @expectedException Mongologue\Exceptions\User\AlreadyRefollowingPostsException
+     * @return void
+     */
+    public function shouldRefollowPosts()
+    {
+        $user1 = array(
+            "id"=>"1238899804831",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899804832",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+
         self::$mongologue->user('unfollowPosts', $user1["id"], $user2["id"]);
+
+        self::$mongologue->user('refollowPosts', $user1["id"], $user2["id"]);
+
+        $user2Data = self::$mongologue->user("find", $user2["id"]);
+        $this->assertTrue(!in_array($user1["id"], $user2Data["postUnfollowing"]));
+
+        self::$mongologue->user('refollowPosts', $user1["id"], $user2["id"]);//duplicate refollow exception
+    }
+
+    /**
+     * should block a User 
+     *
+     * @test
+     * 
+     * @expectedException Mongologue\Exceptions\User\AlreadyBlockingException
+     * @return void
+     */
+    public function shouldBlockUsers()
+    {
+        $user1 = array(
+            "id"=>"1238899804931",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899804932",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+
+        self::$mongologue->user('block', $user1["id"], $user2["id"]);
+
+        $user2Data = self::$mongologue->user("find", $user2["id"]);
+        $this->assertContains($user1["id"], $user2Data["blocking"]);
+
+        self::$mongologue->user('block', $user1["id"], $user2["id"]);//duplicate block exception
+    }
+
+    /**
+     * should unblock a User 
+     *
+     * @test
+     * 
+     * @expectedException Mongologue\Exceptions\User\AlreadyUnBlockingException
+     * @return void
+     */
+    public function shouldUnblockUser()
+    {
+        $user1 = array(
+            "id"=>"1238899805831",
+            "handle"=>"jdoe_1",
+            "email"=>"jdoe1@x.com",
+            "firstName"=>"John_1",
+            "lastName"=>"Doe"
+        );
+        $user2 = array(
+            "id"=>"1238899805832",
+            "handle"=>"jdoe_2",
+            "email"=>"jdoe2@x.com",
+            "firstName"=>"John_2",
+            "lastName"=>"Doe"
+        );
+
+        self::$mongologue->user('register', new \Mongologue\Models\User($user1));
+        self::$mongologue->user('register', new \Mongologue\Models\User($user2));
+
+        self::$mongologue->user('block', $user1["id"], $user2["id"]);
+
+        self::$mongologue->user('unblock', $user1["id"], $user2["id"]);
+
+        $user2Data = self::$mongologue->user("find", $user2["id"]);
+        $this->assertTrue(!in_array($user1["id"], $user2Data["blocking"]));
+
+        self::$mongologue->user('unblock', $user1["id"], $user2["id"]);//duplicate unblock exception
     }
 
     /**
