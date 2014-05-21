@@ -199,11 +199,11 @@ class Group implements Collection
 
         $joinee->joinGroup($groupId);
         $group->addMember($joineeId);
+        
+        $this->_collections->getCollectionFor("inbox")->refresh($joineeId, null, $groupId);
 
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($joinee);
-
-        $this->_collections->getCollectionFor("inbox")->refresh($joineeId, null, $groupId);
     }
 
 
