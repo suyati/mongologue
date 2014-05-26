@@ -191,7 +191,7 @@ class User implements Collection
         }
 
         $myfollowers = array_unique(array_merge($followers, array($user->id)));
-        return array_diff($myfollowers, $user->blocking);
+        return array_diff($myfollowers, array_merge($user->blocking, $user->blockers));
     }
 
     /**
@@ -232,7 +232,7 @@ class User implements Collection
             );
         }
         $mysubscriptions = array_unique(array_merge($following, array($user->id)));
-        return array_diff($mysubscriptions, $user->blocking);
+        return array_diff($mysubscriptions, array_merge($user->blocking, $user->blockers));
     }
 
     /**
@@ -309,10 +309,13 @@ class User implements Collection
     public function block($blockeeId, $blockerId)
     {
         $blocker = $this->modelFromId($blockerId);
+        $blockee = $this->modelFromId($blockeeId);
 
         $blocker->block($blockeeId);
+        $blockee->addBlocker($blockerId);
 
         $this->update($blocker);
+        $this->update($blockee);
      
         $this->_collections->getCollectionFor("inbox")->remove($blockerId, $blockeeId);
         $this->_collections->getCollectionFor("inbox")->remove($blockeeId, $blockerId);
@@ -351,10 +354,13 @@ class User implements Collection
     public function unblock($blockeeId, $blockerId)
     {
         $blocker = $this->modelFromId($blockerId);
+        $blockee = $this->modelFromId($blockeeId);
 
         $blocker->unblock($blockeeId);
+        $blockee->removeBlocker($blockerId);
 
         $this->update($blocker);
+        $this->update($blockee);
      
         $this->_collections->getCollectionFor("inbox")->refresh($blockerId, $blockeeId);
         $this->_collections->getCollectionFor("inbox")->refresh($blockeeId, $blockerId);

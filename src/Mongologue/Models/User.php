@@ -37,6 +37,7 @@ class User extends Model
     protected $followers = array();
     protected $groups = array();
     protected $blocking = array();
+    protected $blockers = array();
     protected $postUnfollowing = array();
     protected $followingGroups = array();
     protected $likes = array();
@@ -101,7 +102,7 @@ class User extends Model
     public function followGroup($groupId)
     {
         if (in_array($groupId, $this->followingGroups)) {
-            throw new Exceptions\AlreadyFollowingException("This Group $groupId is already Being Followed");
+            throw new Exceptions\AlreadyFollowingGroupException("This Group $groupId is already Being Followed");
         }
 
         $this->followingGroups[] = $groupId;
@@ -182,7 +183,7 @@ class User extends Model
     public function unfollowGroup($groupId)
     {
         if (!in_array($groupId, $this->followingGroups)) {
-            throw new Exceptions\NotFollowingException("No Such User is being Followed");
+            throw new Exceptions\NotFollowingGroupException("No Such Group is being Followed");
         }
 
         $this->followingGroups = array_diff($this->followingGroups, array($groupId));
@@ -221,6 +222,38 @@ class User extends Model
     }
 
     /**
+     * Add a Blocker
+     * 
+     * @param string $blockerId Id of the Blocker
+     *
+     * @return void
+     */
+    public function addBlocker($blockerId)
+    {
+        if (in_array($blockerId, $this->blockers)) {
+            throw new Exceptions\AlreadyBlockerException("This User is already this blocker");
+        }
+
+        $this->blockers[] = $blockerId;
+    }
+
+    /**
+     * Remove a User from the Blockers List
+     * 
+     * @param string $blockerId Id of the Blocker to be removed
+     * 
+     * @return void
+     */
+    public function removeBlocker($blockerId)
+    {
+        if (!in_array($blockerId, $this->blockers)) {
+            throw new Exceptions\BlockerNotFoundException("No Such Blocker");
+        }
+
+        $this->blockers = array_diff($this->blockers, array($blockerId));
+    }
+
+    /**
      * Join a Group
      * 
      * @param string $groupId Id of the Group
@@ -232,7 +265,7 @@ class User extends Model
     public function joinGroup($groupId)
     {
         if (in_array($groupId, $this->groups)) {
-            throw new Exception("Already a Member");
+            throw new Exception\AlreadyMemberException("Already a Member");
         }
 
         $this->groups[] = $groupId;
@@ -250,7 +283,7 @@ class User extends Model
     public function leaveGroup($groupId)
     {
         if (!in_array($groupId, $this->groups)) {
-            throw new Exception('Not a Member of Group');
+            throw new Exception\NotMemberException('Not a Member of Group');
         }
 
         $this->groups = array_diff($this->groups, array($groupId));

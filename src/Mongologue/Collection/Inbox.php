@@ -89,7 +89,7 @@ class Inbox implements Collection
 
         if (!is_null($group)) {
             $group = $this->_collections->getCollectionFor("groups")->modelFromId($group);
-            $toAdd = array_diff($group->members, $toUser->blocking, $subscriptions);
+            $toAdd = array_diff($group->members, $toUser->blocking, $toUser->blockers, $subscriptions);
 
             foreach ($toAdd as $from) {
                 if (!in_array($from, $subscriptions)) {
@@ -151,7 +151,7 @@ class Inbox implements Collection
         } else {
             $category = null;
         }
-        if (!in_array($user->id, array_merge($toUser->blocking, $toUser->postUnfollowing))) {
+        if (!in_array($user->id, array_merge($toUser->postUnfollowing))) {
             $message = Message::create($post, $user, $category, $parentGroups);
             $message->setRecipient($toUser->id);
             $this->_collection->insert($message->document());
