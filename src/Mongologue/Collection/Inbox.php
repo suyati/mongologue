@@ -115,17 +115,11 @@ class Inbox implements Collection
      */
     public function write(Models\Post $post)
     {
-        $user = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
+        $user         = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
         $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
 
-        $recipients = $this->_collections->getCollectionFor("users")->followers($user->id);
-        
-        if ($post->category) {
-            $category = $this->_collections->getCollectionFor("category")->modelFromId($post->category);
-        } else {
-            $category = null;
-        }
-        
+        $recipients   = $this->_collections->getCollectionFor("users")->followers($user->id);
+
         foreach ($recipients as $recipient) {
             $toUser = $this->_collections->getCollectionFor("users")->modelFromId($recipient);
             $this->_createMessage($post, $user, $parentGroups, $toUser);

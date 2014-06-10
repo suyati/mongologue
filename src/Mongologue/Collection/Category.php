@@ -38,7 +38,7 @@ class Category implements Collection
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
         $this->_collections = $collections;
-        $this->_collection = $mongoCollection;
+        $this->_collection  = $mongoCollection;
     }
 
     /**
@@ -66,7 +66,7 @@ class Category implements Collection
     public function all()
     {
         $categories = array();
-        $cursor = $this->_collection->find();
+        $cursor     = $this->_collection->find();
 
         foreach ($cursor as $document) {
             $categories[] = new Models\Category($document);

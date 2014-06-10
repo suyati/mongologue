@@ -36,8 +36,8 @@ class Counter implements Collection
      */
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
-        $this->_collections = $collections; 
-        $this->_collection = $mongoCollection;
+        $this->_collections = $collections;
+        $this->_collection  = $mongoCollection;
     }
 
     /**
@@ -63,8 +63,8 @@ class Counter implements Collection
     public function nextId($id)
     {
         $count = $this->_collection->findAndModify(
-            array("id"=>$id),
-            array('$inc'=>array("s"=>1)),
+            array("id"   => $id),
+            array('$inc' => array("s"=>1)),
             null,
             array("upsert"=>true, "new"=>true)
         );

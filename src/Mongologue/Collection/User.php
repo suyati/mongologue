@@ -177,17 +177,9 @@ class User implements Collection
             $members = $group->members;
             $groupFollowers = $group->followers;
 
-            $members = array_merge(
-                array_intersect($members, $groupFollowers),
-                array_diff($members, $groupFollowers),
-                array_diff($groupFollowers, $members)
-            );
+            $members = array_unique(array_merge($members, $groupFollowers));
 
-            $followers = array_merge(
-                array_intersect($members, $followers),
-                array_diff($members, $followers),
-                array_diff($followers, $members)
-            );
+            $followers = array_unique(array_merge($members, $followers));
         }
 
         $myfollowers = array_unique(array_merge($followers, array($user->id)));
@@ -203,33 +195,25 @@ class User implements Collection
      */
     public function subscriptions($id)
     {
-        $user = $this->modelFromId($id);
+        $user      = $this->modelFromId($id);
 
         $following = $user->following;
-        $groups = $user->followingGroups;
+        $groups    = $user->followingGroups;
 
         foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
-            $members = $group->members;
+            $group     = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members   = $group->members;
 
-            $following = array_merge(
-                array_intersect($members, $following),
-                array_diff($members, $following),
-                array_diff($following, $members)
-            );
+            $following = array_unique(array_merge($members, $following));
         }
 
-        $groups = $user->groups;
+        $groups    = $user->groups;
 
         foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
-            $members = $group->members;
+            $group     = $this->_collections->getCollectionFor("groups")->modelFromId($groupId);
+            $members   = $group->members;
 
-            $following = array_merge(
-                array_intersect($members, $following),
-                array_diff($members, $following),
-                array_diff($following, $members)
-            );
+            $following = array_unique(array_merge($members, $following));
         }
         $mysubscriptions = array_unique(array_merge($following, array($user->id)));
         return array_diff($mysubscriptions, array_merge($user->blocking, $user->blockers));
@@ -245,10 +229,10 @@ class User implements Collection
     public function parentGroups(Models\User $user)
     {
         $parentGroups = array();
-        $groups = $user->groups;
+        $groups       = $user->groups;
 
         foreach ($groups as $groupId) {
-            $group = $this->_collections->getCollectionFor("groups")->parent($groupId, true);
+            $group          = $this->_collections->getCollectionFor("groups")->parent($groupId, true);
             $parentGroups[] = array("id"=>$group->id, "name"=>$group->name);
         }
 

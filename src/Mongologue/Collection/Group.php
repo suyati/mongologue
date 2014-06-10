@@ -38,7 +38,7 @@ class Group implements Collection
     public function __construct(\MongoCollection $mongoCollection, Collections $collections)
     {
         $this->_collections = $collections;
-        $this->_collection = $mongoCollection;
+        $this->_collection  = $mongoCollection;
     }
 
     /**
@@ -151,7 +151,7 @@ class Group implements Collection
      */
     public function follow($groupId, $followerId)
     {
-        $group = $this->modelFromId($groupId);
+        $group    = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
         $group->addFollower($followerId);
@@ -172,7 +172,7 @@ class Group implements Collection
      */
     public function unfollow($groupId, $followerId)
     {
-        $group = $this->modelFromId($groupId);
+        $group    = $this->modelFromId($groupId);
         $follower = $this->_collections->getCollectionFor("users")->modelFromId($followerId);
 
         $group->removeFollower($followerId);
@@ -194,7 +194,7 @@ class Group implements Collection
      */
     public function join($groupId, $joineeId)
     {
-        $group = $this->modelFromId($groupId);
+        $group  = $this->modelFromId($groupId);
         $joinee = $this->_collections->getCollectionFor("users")->modelFromId($joineeId);
 
         $joinee->joinGroup($groupId);
@@ -236,7 +236,7 @@ class Group implements Collection
      */
     public function leave($groupId, $memberId)
     {
-        $group = $this->modelFromId($groupId);
+        $group  = $this->modelFromId($groupId);
         $member = $this->_collections->getCollectionFor("users")->modelFromId($memberId);
 
         $joinee->leaveGroup($groupId);

@@ -87,15 +87,15 @@ class Post implements Collection
      */
     public function savePost(Models\Post $post)
     {
+        $this->saveFiles($post);
+        $this->_collection->insert($post->document());
+        
         if ($post->isComment()) {
             $parent = $this->modelFromID($post->parent);
             $parent->addComment($post->id);
             $this->update($parent);
         }
         
-        $this->saveFiles($post);
-        $this->_collection->insert($post->document());
-
         return $post->id;
     }
 
@@ -112,7 +112,7 @@ class Post implements Collection
         $post->setId(
             $this->_collections->getCollectionFor("counters")->nextId("posts")
         );
-        $postId = $this->savePost($post);
+        $postId    = $this->savePost($post);
         $savedPost = $this->modelFromId($postId);
 
         if (!in_array($savedPost->type, $this->_neglectTypes)) {
@@ -180,7 +180,7 @@ class Post implements Collection
      */
     public function all()
     {
-        $posts = array();
+        $posts  = array();
         $cursor = $this->_collection->find();
 
         foreach ($cursor as $document) {
@@ -197,7 +197,7 @@ class Post implements Collection
      */
     public function search($query)
     {
-        $posts = array();
+        $posts  = array();
         $cursor = $this->_collection->find($query);
 
         foreach ($cursor as $document) {
@@ -262,7 +262,7 @@ class Post implements Collection
     public function getComments($postId)
     {
         $comments = array();
-        $posts = $this->search(array("parent" => $postId));
+        $posts    = $this->search(array("parent" => $postId));
         foreach ($posts as $post) {
             $comments[] = $post->document();
         }
@@ -296,7 +296,7 @@ class Post implements Collection
     private function _addLikedPostsToUser($likedUserId, $likedPostId)
     {
         $user_collection = $this->_collections->getCollectionFor("users");
-        $user = $user_collection->modelFromId($likedUserId);
+        $user            = $user_collection->modelFromId($likedUserId);
         if (in_array($likedPostId, $user->likes)) {
             throw new Exceptions\Post\AlreadyAddedPostIdException("User with ID $likedPostId is already being liked by this user");
         } else {

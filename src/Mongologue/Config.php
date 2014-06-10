@@ -23,13 +23,13 @@ namespace Mongologue;
  */
 class Config
 {
-    const DB_NAME = "twitterMongo";
-    const USER_COLLECTION = "users";
-    const POST_COLLECTION = "posts";
-    const GROUP_COLLECTION = "groups";
-    const COMMENTS_COLLECTION = "comments";
-    const CATEGORY_COLLECTION = "category";
-    const INBOX_COLLECTION = "inbox";
-    const PREMADEPOST_COLLECTION = "premadepost";
+    const DB_NAME                 = "twitterMongo";
+    const USER_COLLECTION         = "users";
+    const POST_COLLECTION         = "posts";
+    const GROUP_COLLECTION        = "groups";
+    const COMMENTS_COLLECTION     = "comments";
+    const CATEGORY_COLLECTION     = "category";
+    const INBOX_COLLECTION        = "inbox";
+    const PREMADEPOST_COLLECTION  = "premadepost";
     const NOTIFICATION_COLLECTION = "notification";
 }

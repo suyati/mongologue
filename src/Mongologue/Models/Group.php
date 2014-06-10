@@ -98,7 +98,7 @@ class Group extends Model
             throw new \Exception("User with ID $userId Already a Follower of the Group");
         }
 
-        $this->followers = array_diff($this->followers, array($userId));
+        $this->followers = array_values(array_diff($this->followers, array($userId)));
     }
 
     /**
@@ -116,7 +116,7 @@ class Group extends Model
             throw new Exceptions\MemberNotFoundException("User $userId is not a member of the Group");
         }
 
-        $this->members = array_diff($this->members, array($userId));
+        $this->members = array_values(array_diff($this->members, array($userId)));
     }
 
     /**

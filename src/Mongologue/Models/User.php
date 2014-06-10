@@ -89,7 +89,7 @@ class User extends Model
             throw new Exceptions\NotFollowingException("No Such User is being Followed");
         }
 
-        $this->following = array_diff($this->following, array($followeeId));
+        $this->following = array_values(array_diff($this->following, array($followeeId)));
     }
 
     /**
@@ -154,7 +154,7 @@ class User extends Model
             throw new Exceptions\AlreadyUnBlockingException("This User $userId is already Being unblocked");
         }
         
-        $this->blocking = array_diff($this->blocking, array($userId));
+        $this->blocking = array_values(array_diff($this->blocking, array($userId)));
     }
 
     /**
@@ -170,7 +170,7 @@ class User extends Model
             throw new Exceptions\AlreadyRefollowingPostsException("This User $userId is already re-followed posts");
         }
 
-        $this->postUnfollowing = array_diff($this->postUnfollowing, array($userId));
+        $this->postUnfollowing = array_values(array_diff($this->postUnfollowing, array($userId)));
     }
 
     /**
@@ -186,7 +186,7 @@ class User extends Model
             throw new Exceptions\NotFollowingGroupException("No Such Group is being Followed");
         }
 
-        $this->followingGroups = array_diff($this->followingGroups, array($groupId));
+        $this->followingGroups = array_values(array_diff($this->followingGroups, array($groupId)));
     }
 
     /**
@@ -218,7 +218,7 @@ class User extends Model
             throw new Exceptions\FollowerNotFoundException("No Such Follower");
         }
 
-        $this->followers = array_diff($this->followers, array($followerId));
+        $this->followers = array_values(array_diff($this->followers, array($followerId)));
     }
 
     /**
@@ -250,7 +250,7 @@ class User extends Model
             throw new Exceptions\BlockerNotFoundException("No Such Blocker");
         }
 
-        $this->blockers = array_diff($this->blockers, array($blockerId));
+        $this->blockers = array_values(array_diff($this->blockers, array($blockerId)));
     }
 
     /**
@@ -286,7 +286,7 @@ class User extends Model
             throw new Exception\NotMemberException('Not a Member of Group');
         }
 
-        $this->groups = array_diff($this->groups, array($groupId));
+        $this->groups = array_values(array_diff($this->groups, array($groupId)));
     }
 
     /**

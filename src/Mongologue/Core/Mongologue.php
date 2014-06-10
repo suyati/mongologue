@@ -43,11 +43,11 @@ class Mongologue
      */
     public function __construct(Collection\User $userCollection, Collection\Group $groupCollection, Collection\Post $postCollection, Collection\Inbox $inboxCollection, Collection\Category $categoryCollection, Collection\Notification $notificationCollection)
     {
-        $this->_userCollection = $userCollection;
-        $this->_groupCollection = $groupCollection;
-        $this->_postCollection = $postCollection;
-        $this->_inboxCollection = $inboxCollection;
-        $this->_categoryCollection = $categoryCollection;
+        $this->_userCollection         = $userCollection;
+        $this->_groupCollection        = $groupCollection;
+        $this->_postCollection         = $postCollection;
+        $this->_inboxCollection        = $inboxCollection;
+        $this->_categoryCollection     = $categoryCollection;
         $this->_notificationCollection = $notificationCollection;
     }
 
