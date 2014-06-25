@@ -1,7 +1,7 @@
 [![Build Status](https://api.travis-ci.org/suyati/mongologue.svg)](https://travis-ci.org/suyati/mongologue)
 
 #Mongologue
---------
+
 
 A PHP Library to help build Microblogging Servers using Mongo DB
 
@@ -18,9 +18,9 @@ Supports:
 *Mongologue* is available as a [Composer Package](https://packagist.org/packages/suyati/mongologue). 
 
 Just add the following to your composer.json file:
-
-  require : {"suyati/mongologue": "dev-develop"}
-  
+```javascript
+require : {"suyati/mongologue": "dev-develop"}
+```  
 ##Using Mongologue
 Just look at the TESTS
 
