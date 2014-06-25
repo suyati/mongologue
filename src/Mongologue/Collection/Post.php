@@ -199,6 +199,7 @@ class Post implements Collection
     {
         $posts  = array();
         $cursor = $this->_collection->find($query);
+        $cursor = $cursor->sort(array("id"=>1));
 
         foreach ($cursor as $document) {
             $posts[] = new Models\Post($document);
