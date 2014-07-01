@@ -48,7 +48,7 @@ class User extends Model
      */
     protected $data = array();
 
-    private $_necessaryAttributes = array("id", "handle", "firstName", "lastName", "email");
+    private $_necessaryAttributes = array("id", "handle", "firstName", "lastName");
 
     /**
      * Constructor of Class

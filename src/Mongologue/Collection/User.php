@@ -372,11 +372,12 @@ class User implements Collection
      * 
      * @return array List of All maching users
      */
-    public function search($query)
+    public function search($query, $fields = array())
     {
         $users  = array();
-        $cursor = $this->_collection->find($query);
+        $cursor = $this->_collection->find($query, $fields);
         $cursor = $cursor->sort(array("handle"=>1));
+        error_log(print_r($cursor, true));
 
         foreach ($cursor as $document) {
             $users[] = new Models\User($document);
