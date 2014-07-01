@@ -377,7 +377,6 @@ class User implements Collection
         $users  = array();
         $cursor = $this->_collection->find($query, $fields);
         $cursor = $cursor->sort(array("handle"=>1));
-        error_log(print_r($cursor, true));
 
         foreach ($cursor as $document) {
             $users[] = new Models\User($document);
