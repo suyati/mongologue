@@ -28,15 +28,16 @@ class Post extends Model
     protected $id;
     protected $content;
     protected $userId;
-    protected $files = array();
     protected $parent;
-    protected $likes = array();
-    protected $comments = array();
+
     protected $type;
     protected $datetime;
     protected $category;
-    protected $recipients = array();
-
+    protected $files         = array();
+    protected $likes         = array();
+    protected $comments      = array();
+    protected $recipients    = array();
+    protected $taggedUsers   = array();
     private $_filesToBeAdded = array();
 
     /**

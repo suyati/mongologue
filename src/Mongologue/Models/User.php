@@ -41,7 +41,6 @@ class User extends Model
     protected $postUnfollowing = array();
     protected $followingGroups = array();
     protected $likes           = array();
-    protected $taggedUsers     = array();
 
     /**
      * Allows Storage of other Information
