@@ -379,7 +379,7 @@ class User implements Collection
         $cursor = $cursor->sort(array("handle"=>1));
 
         foreach ($cursor as $document) {
-            $users[] = new Models\User($document);
+            $users[] = $document;
         }
 
         return $users;
