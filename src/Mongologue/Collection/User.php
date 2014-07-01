@@ -368,6 +368,24 @@ class User implements Collection
     }
 
     /**
+     * Get All maching Users
+     * 
+     * @return array List of All maching users
+     */
+    public function search($query)
+    {
+        $users  = array();
+        $cursor = $this->_collection->find($query);
+        $cursor = $cursor->sort(array("handle"=>1));
+
+        foreach ($cursor as $document) {
+            $users[] = new Models\User($document);
+        }
+
+        return $users;
+    }
+
+    /**
      * Execute a Command and return the Results
      * 
      * @param string $callable A function of the instance

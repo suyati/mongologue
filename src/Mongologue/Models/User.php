@@ -33,14 +33,15 @@ class User extends Model
     protected $email;
     protected $pic;
 
-    protected $following = array();
-    protected $followers = array();
-    protected $groups = array();
-    protected $blocking = array();
-    protected $blockers = array();
+    protected $following       = array();
+    protected $followers       = array();
+    protected $groups          = array();
+    protected $blocking        = array();
+    protected $blockers        = array();
     protected $postUnfollowing = array();
     protected $followingGroups = array();
-    protected $likes = array();
+    protected $likes           = array();
+    protected $taggedUsers     = array();
 
     /**
      * Allows Storage of other Information
