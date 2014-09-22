@@ -24,6 +24,7 @@ use \Mongologue\Exception;
  */
 class Notification extends Model
 {
+    protected $id;
     protected $notifierId;
     protected $message;
     protected $userId;
@@ -49,6 +50,18 @@ class Notification extends Model
     public function __construct($notification)
     {
         parent::__construct($notification);
+    }
+
+    /**
+     * Set ID of the Notification
+     * 
+     * @param string $id Id of the Notification
+     *
+     * @return void
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     /**

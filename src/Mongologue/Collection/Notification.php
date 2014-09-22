@@ -52,6 +52,9 @@ class Notification implements Collection
      */
     public function create(Models\Notification $notification)
     {
+        $notification->setId(
+            $this->_collections->getCollectionFor("counters")->nextId("notifications")
+        );
         $this->_collection->insert($notification->document());
     }
 
@@ -82,6 +85,40 @@ class Notification implements Collection
     public function get($userId, $limit = null, $since = null, $upto = null)
     {
         $query = array("notifierId" => $userId);
+        if ($since) {
+            $query["notification"] = array('$lt' => $since);
+        } elseif ($upto) {
+            $query["notification"] = array('$gt' => $upto);
+        }
+
+        $cursor = $this->_collection->find($query);
+        $cursor = $cursor->sort(array("notification"=>-1));
+
+        if ($limit) {
+            $cursor->limit((int)$limit);
+        }
+
+        $response = array();
+
+        foreach ($cursor as $notification) {
+            $response[] = $notification;
+        }
+
+        return $response;
+    }
+
+    /**
+     * Get the unread Notifications For a User
+     * 
+     * @param string  $userId ID of the User
+     * @param integer $limit  Pagination Limit
+     * @param integer $since  Since Which ID
+     * 
+     * @return array List of Notifications
+     */
+    public function getUnread($userId, $limit = null, $since = null, $upto = null)
+    {
+        $query = array("notifierId" => $userId, "read" => false);
         if ($since) {
             $query["notification"] = array('$lt' => $since);
         } elseif ($upto) {
