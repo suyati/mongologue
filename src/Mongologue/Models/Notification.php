@@ -31,6 +31,7 @@ class Notification extends Model
     protected $postId;
     protected $postImage;
     protected $type;
+    protected $read;
 
     /**
      * Additional Data container

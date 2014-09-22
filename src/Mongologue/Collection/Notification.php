@@ -56,6 +56,21 @@ class Notification implements Collection
     }
 
     /**
+     * Update document of a Notification
+     * 
+     * @param Models\Notification $notification Model of a notification
+     * 
+     * @return void
+     */
+    public function update(Models\Notification $notification)
+    {
+        $this->_collection->update(
+            array("id" => $notification->id),
+            $notification->document()
+        );
+    }
+
+    /**
      * Get the Notifications For a User
      * 
      * @param string  $userId ID of the User
@@ -64,11 +79,13 @@ class Notification implements Collection
      * 
      * @return array List of Notifications
      */
-    public function get($userId, $limit = null, $since = null)
+    public function get($userId, $limit = null, $since = null, $upto = null)
     {
         $query = array("notifierId" => $userId);
         if ($since) {
-            $query["notification"] = array('$gt' => $since);
+            $query["notification"] = array('$lt' => $since);
+        } elseif ($upto) {
+            $query["notification"] = array('$gt' => $upto);
         }
 
         $cursor = $this->_collection->find($query);
