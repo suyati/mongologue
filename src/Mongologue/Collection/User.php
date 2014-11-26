@@ -255,7 +255,7 @@ class User implements Collection
         $follower->follow($followeeId);
         $followee->addFollower($followerId);
 
-        $this->_collections->getCollectionFor("inbox")->refresh($followerId, $followeeId);
+        // $this->_collections->getCollectionFor("inbox")->refresh($followerId, $followeeId);
         $this->update($follower);
         $this->update($followee);
     }

@@ -157,7 +157,7 @@ class Group implements Collection
         $group->addFollower($followerId);
         $follower->followGroup($groupId);
         
-        $this->_collections->getCollectionFor("inbox")->refresh($followerId, null, $groupId);
+        // $this->_collections->getCollectionFor("inbox")->refresh($followerId, null, $groupId);
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($follower);
     }
@@ -200,7 +200,7 @@ class Group implements Collection
         $joinee->joinGroup($groupId);
         $group->addMember($joineeId);
         
-        $this->_collections->getCollectionFor("inbox")->refresh($joineeId, null, $groupId);
+        // $this->_collections->getCollectionFor("inbox")->refresh($joineeId, null, $groupId);
 
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($joinee);
