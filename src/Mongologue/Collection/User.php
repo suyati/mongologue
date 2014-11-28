@@ -279,7 +279,7 @@ class User implements Collection
         $this->update($follower);
         $this->update($followee);
 
-        $this->_collections->getCollectionFor("inbox")->clean($followerId, $followeeId);
+        // $this->_collections->getCollectionFor("inbox")->clean($followerId, $followeeId);
     }
 
     /**

@@ -181,7 +181,7 @@ class Group implements Collection
         $follower->unfollowGroup($groupId);
         $this->_collections->getCollectionFor("users")->update($follower);
 
-        $this->_collections->getCollectionFor("inbox")->clean($followerId, null, $groupId);
+        // $this->_collections->getCollectionFor("inbox")->clean($followerId, null, $groupId);
     }
 
     /**
