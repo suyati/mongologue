@@ -621,13 +621,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
         
-        $this->assertEquals(2, count($feed_user_2));
+        $this->assertEquals(3, count($feed_user_2));
 
         foreach ($feed_user_2 as $key => $post) {
             $this->assertEquals($user2["id"], $post["to"]);
-            $this->assertContains($post["user"]["id"], array($user2["id"], $user1["id"]));
-            $this->assertContains($post["from"], array($user1["id"], $user2["id"]));
-            $this->assertContains($post["content"], array($post1["content"], $post3["content"]));
+            $this->assertContains($post["user"]["id"], array($user2["id"], $user1["id"], $user4["id"]));
+            $this->assertContains($post["from"], array($user1["id"], $user2["id"], $user4["id"]));
+            $this->assertContains($post["content"], array($post1["content"], $post3["content"], $post2["content"]));
         }
 
         self::$mongologue->user("follow", $user4["id"], $user2["id"]);
@@ -677,13 +677,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
 
         $feed_user_3 = self::$mongologue->inbox('feed', $user3["id"]);
         
-        $this->assertEquals(1, count($feed_user_3));
+        $this->assertEquals(2, count($feed_user_3));
 
         foreach ($feed_user_3 as $key => $post) {
             $this->assertEquals($user3["id"], $post["to"]);
-            $this->assertEquals($post["user"]["id"], $user1["id"]);
-            $this->assertEquals($post["from"], $user1["id"]);
-            $this->assertEquals($post["content"], $post1["content"]);
+            $this->assertContains($post["user"]["id"], array($user1["id"], $user2["id"]));
+            $this->assertContains($post["from"], array($user1["id"], $user2["id"]));
+            $this->assertContains($post["content"], array($post1["content"], $post3["content"]));
         }
 
         self::$mongologue->group("follow", $group1["id"], $user3["id"]);
@@ -819,13 +819,13 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
         self::$mongologue->user('follow', $user1["id"], $user2["id"]);
         
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
-        $this->assertEquals(1, count($feed_user_2));
+        $this->assertEquals(0, count($feed_user_2));
 
         self::$mongologue->user('unfollow', $user1["id"], $user2["id"]);
         self::$mongologue->user('follow', $user1["id"], $user2["id"]);
         
         $feed_user_2 = self::$mongologue->inbox('feed', $user2["id"]);
-        $this->assertEquals(1, count($feed_user_2));
+        $this->assertEquals(0, count($feed_user_2));
 
 
     }
