@@ -61,6 +61,7 @@ class Post implements Collection
     public function setGridFS(\MongoGridFS $grid)
     {
         $this->_grid = $grid;
+        return true;
     }
 
     /**
@@ -75,6 +76,7 @@ class Post implements Collection
         foreach ($post->filesToBeAdded() as $name => $attributes) {
             $post->addFile($this->_grid->storeFile($name, $attributes));
         }
+        return true;
     }
 
 
@@ -136,6 +138,7 @@ class Post implements Collection
             array("id" => $post->id),
             $post->document()
         );
+        return true;
     }
 
     /**

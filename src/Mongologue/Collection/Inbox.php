@@ -150,6 +150,7 @@ class Inbox implements Collection
             $message->setRecipient($toUser->id);
             $this->_collection->insert($message->document());
         }
+        return true;
     }
 
     /**
@@ -164,6 +165,7 @@ class Inbox implements Collection
     {
         $query = array("to"=>$to, "from"=>$from);
         $this->_collection->remove($query);
+        return true;
     }
 
 

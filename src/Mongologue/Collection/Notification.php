@@ -56,6 +56,7 @@ class Notification implements Collection
             $this->_collections->getCollectionFor("counters")->nextId("notifications")
         );
         $this->_collection->insert($notification->document());
+        return true;
     }
 
     /**
@@ -71,6 +72,7 @@ class Notification implements Collection
             array("id" => $notification->id),
             $notification->document()
         );
+        return true;
     }
 
     /**
@@ -156,6 +158,7 @@ class Notification implements Collection
                        "userId"     => $userId
                 );
         $this->_collection->remove($query);
+        return true;
     }
 
     /**

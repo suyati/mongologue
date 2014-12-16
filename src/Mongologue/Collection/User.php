@@ -56,6 +56,7 @@ class User implements Collection
             array("id" => $user->id),
             $user->document()
         );
+        return true;
     }
 
     /**
@@ -258,6 +259,7 @@ class User implements Collection
         // $this->_collections->getCollectionFor("inbox")->refresh($followerId, $followeeId);
         $this->update($follower);
         $this->update($followee);
+        return true;
     }
 
     /**
@@ -280,6 +282,7 @@ class User implements Collection
         $this->update($followee);
 
         // $this->_collections->getCollectionFor("inbox")->clean($followerId, $followeeId);
+        return true;
     }
 
     /**
@@ -306,6 +309,7 @@ class User implements Collection
 
         $this->_collections->getCollectionFor("notification")->remove($blockerId, $blockeeId);
         $this->_collections->getCollectionFor("notification")->remove($blockeeId, $blockerId);
+        return true;
     }
 
     /**
@@ -325,6 +329,7 @@ class User implements Collection
         $this->update($unfollower);
 
         $this->_collections->getCollectionFor("inbox")->remove($unfollowerId, $unfolloweeId);
+        return true;
     }
 
     /**
@@ -348,6 +353,7 @@ class User implements Collection
      
         $this->_collections->getCollectionFor("inbox")->refresh($blockerId, $blockeeId);
         $this->_collections->getCollectionFor("inbox")->refresh($blockeeId, $blockerId);
+        return true;
     }
 
     /**
@@ -365,6 +371,7 @@ class User implements Collection
         $unfollower->postRefollow($unfolloweeId);
 
         $this->update($unfollower);
+        return true;
     }
 
     /**

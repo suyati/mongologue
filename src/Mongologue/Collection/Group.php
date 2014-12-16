@@ -55,6 +55,7 @@ class Group implements Collection
             array("id" => $group->id),
             $group->document()
         );
+        return true;
     }
 
     /**
@@ -106,6 +107,7 @@ class Group implements Collection
         } catch (Exceptions\Group\GroupNotFoundException $e) {
             throw new Exception("Group with this ID not found");
         }
+        return true;
     }
 
     /**
@@ -160,6 +162,7 @@ class Group implements Collection
         // $this->_collections->getCollectionFor("inbox")->refresh($followerId, null, $groupId);
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($follower);
+        return true;
     }
 
     /**
@@ -182,6 +185,7 @@ class Group implements Collection
         $this->_collections->getCollectionFor("users")->update($follower);
 
         // $this->_collections->getCollectionFor("inbox")->clean($followerId, null, $groupId);
+        return true;
     }
 
     /**
@@ -204,6 +208,7 @@ class Group implements Collection
 
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($joinee);
+        return true;
     }
 
 
@@ -244,6 +249,7 @@ class Group implements Collection
 
         $this->update($group);
         $this->_collections->getCollectionFor("users")->update($member);
+        return true;
     }
 
     /**
