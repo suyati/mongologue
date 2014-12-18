@@ -119,7 +119,7 @@ class Group implements Collection
     {
         $groups = array();
         $cursor = $this->_collection->find();
-
+        $cursor = $cursor->sort(array("name"=>1));
         foreach ($cursor as $document) {
             $groups[] = new Models\Group($document);
         }
