@@ -119,12 +119,30 @@ class Inbox implements Collection
         $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($user);
 
         $recipients   = $this->_collections->getCollectionFor("users")->followers($user->id);
-
+        $recipients   = array_diff($recipients, array($post->userId));
+        
         foreach ($recipients as $recipient) {
             $toUser = $this->_collections->getCollectionFor("users")->modelFromId($recipient);
             $this->_createMessage($post, $user, $parentGroups, $toUser);
         }
 
+        return true;
+    }
+
+    /**
+     * Write Messages to Owner's Inbox
+     * 
+     * @param Models\Post $post Post Models
+     * 
+     * @return boolean True if Success
+     */
+    public function writeToMyInbox(Models\Post $post)
+    {
+        $owner        = $this->_collections->getCollectionFor("users")->modelFromId($post->userId);
+        $parentGroups = $this->_collections->getCollectionFor("users")->parentGroups($owner);
+
+        $this->_createMessage($post, $owner, $parentGroups, $owner);
+        
         return true;
     }
 
