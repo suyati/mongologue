@@ -52,11 +52,10 @@ class User implements Collection
      */
     public function update(Models\User $user)
     {
-        $this->_collection->update(
+        return $this->_collection->update(
             array("id" => $user->id),
             $user->document()
         );
-        return true;
     }
 
     /**
