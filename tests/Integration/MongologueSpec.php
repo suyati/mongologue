@@ -860,6 +860,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
+                    "profilePics" => array(),
                     "data" => array()
                 )
             ),
@@ -888,6 +889,7 @@ class MongologueSpec extends \PHPUnit_Framework_TestCase
                     "postUnfollowing" => array(),
                     "followingGroups" => array(),
                     "likes" => array(),
+                    "profilePics" => array(),
                     "data" => array()
                 )
             )
