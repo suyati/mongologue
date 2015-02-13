@@ -89,7 +89,7 @@ class Post implements Collection
      */
     public function savePost(Models\Post $post)
     {
-        $this->saveFiles($post);
+        // $this->saveFiles($post);
         $this->_collection->insert($post->document());
         
         if ($post->isComment()) {
